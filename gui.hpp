@@ -7,9 +7,6 @@
 #include <iostream>
 
 
-const int WIDTH = 800;
-const int HEIGHT = 600;
-
 enum MoveInfo{
     UP,DOWN,LEFT,RIGHT,ZIN,ZOUT,NOPE
 };
@@ -23,8 +20,10 @@ class gui {
     public:
     VkSurfaceKHR surface;
     static MoveInfo move_msg;
+    int HEIGHT = 600;
+    int WIDTH = 800;
 
-    gui();
+
     void initWindow();
     bool shouldClose();
     MoveInfo poll();

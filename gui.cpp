@@ -2,9 +2,6 @@
 
 MoveInfo gui::move_msg = NOPE; //why here?
 
-gui::gui(){
-    initWindow();
-}
 
 void gui::initWindow(){
     glfwInit();

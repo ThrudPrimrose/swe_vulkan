@@ -1,48 +1,13 @@
 #include "creator.hpp"
 
-    void Creator::run() {
-        mainLoop();
-        cleanup();
-    }
-
-    void Creator::mainLoop() {
-        while (!interface.shouldClose()){ //wrapper around glfwshouldclose
-            interface.poll(); //wrapper around glfw poll eventes
+ void Creator::createInstance() {
+    if (enableValidationLayers && !checkValidationLayerSupport()) {
+            throw std::runtime_error("validation layers requested, but not available!");
         }
-    }
 
-    void Creator::cleanup() {
-        delete &gDevice;
-        if (enableValidationLayers) {
-            DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
-        }
-        vkDestroySurfaceKHR(instance, interface.surface, nullptr);
-        vkDestroyInstance(instance, nullptr);
-        interface.killWindow();
-        delete &interface; //destroy our class
-    }
-
-    Creator::Creator(){
-        createInstance();
-        setupDebugMessenger(instance, debugMessenger);
-        interface.createSurface(instance);
-        //combine gDevice functions to one thing
-        gDevice.setSurface(interface.surface); //a hack becasue functions need the surface parameter
-        gDevice.pickPhysDevice(instance);
-        gDevice.createLogicalDevice(val_layer);
-        gDevice.createSwapChain();
-        interface.surface = gDevice.surface;
-        gDevice.createImageViews();
-        gDevice.createGraphicsPipeline();
-        //so right now gui and device has surface, any update to surface
-        //should be assigned to both just in case
-
-    }
-
-    void Creator::createInstance() {
         VkApplicationInfo appInfo = {};
         appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-        appInfo.pApplicationName = "SWE";
+        appInfo.pApplicationName = "Hello Triangle";
         appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
         appInfo.pEngineName = "No Engine";
         appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
@@ -58,23 +23,73 @@
 
         VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo;
         if (enableValidationLayers) {
-            val_layer= true;
             createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
             createInfo.ppEnabledLayerNames = validationLayers.data();
 
             populateDebugMessengerCreateInfo(debugCreateInfo);
             createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*) &debugCreateInfo;
         } else {
-            val_layer=false;
             createInfo.enabledLayerCount = 0;
-            
+
             createInfo.pNext = nullptr;
         }
 
         if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS) {
             throw std::runtime_error("failed to create instance!");
         }
+}
+
+void Creator::run(){
+    interface.initWindow();
+    initVulkan();
+    mainLoop();
+    cleanup();
+}
+
+void Creator::initVulkan(){
+    createInstance();
+    setupDebugMessenger(instance, debugMessenger);
+    interface.createSurface(instance);
+    gDevice.pickPhysicalDevice(instance, interface.surface);
+    gDevice.createLogicalDevice(instance,enableValidationLayers,validationLayers,interface.surface);
+    gDevice.HEIGHT = interface.HEIGHT;
+    gDevice.WIDTH = interface.WIDTH;
+    gDevice.createSwapchain(interface.surface);
+    gDevice.createImageViews();
+    gDevice.createRenderPass();
+    gDevice.createGraphicsPipeline();
+}
+
+void Creator::mainLoop() {
+        while (!interface.shouldClose()) {
+           interface.poll();
+        }
     }
+
+void Creator::cleanup(){
+    vkDestroyPipeline(gDevice.logicDevice, gDevice.graphicsPipeline, nullptr);
+    vkDestroyPipelineLayout(gDevice.logicDevice, gDevice.pipelineLayout, nullptr);
+    vkDestroyRenderPass(gDevice.logicDevice, gDevice.renderPass, nullptr);
+    vkDestroyPipelineLayout(gDevice.logicDevice, gDevice.pipelineLayout, nullptr);
+    for (auto imageView : gDevice.swapChainImageViews) {
+        vkDestroyImageView(gDevice.logicDevice, imageView, nullptr);
+    }
+    vkDestroySwapchainKHR(gDevice.logicDevice, gDevice.swapChain, nullptr);
+    vkDestroyDevice(gDevice.logicDevice, nullptr);
+    if (enableValidationLayers) {
+        DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
+    }
+    vkDestroySurfaceKHR(instance, interface.surface, nullptr);
+    vkDestroyInstance(instance, nullptr);
+    interface.killWindow();
+    delete &interface;
+    delete &gDevice;
+}
+
+Creator::Creator(){
+    interface.HEIGHT = HEIGHT;
+    interface.WIDTH = WIDTH;
+}
 
 
 int main() {

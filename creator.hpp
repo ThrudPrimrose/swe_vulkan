@@ -3,12 +3,15 @@
 
 #include <vulkan/vulkan.h>
 #include "gui.hpp"
-#include "debug_tools.hpp"
 #include <iostream>
 #include <stdexcept>
 #include <functional>
 #include <cstdlib>
 #include "device.hpp"
+#include "debug_tools.hpp"
+
+const int WIDTH = 800;
+const int HEIGHT = 600;
 
 
 class Creator {
@@ -21,13 +24,14 @@ private:
     VkInstance instance;
     VkDebugUtilsMessengerEXT debugMessenger;
     device gDevice;
-
-    bool val_layer;
+    
+    size_t currentFrame = 0;
 
     void initVulkan();
     void mainLoop();
     void cleanup();
     void createInstance();
+    void drawFrame(device gDevice);
 };
 
 
