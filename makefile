@@ -1,8 +1,9 @@
 VULKAN_SDK_PATH = /home/thrud/vulkan/1.1.130.0/x86_64
 STB_INCLUDE_PATH = /home/thrud/libraries/stb
 TINYOBJ_INCLUDE_PATH = /home/thrud/libraries/tinyobjloader
+IMGUI_INCLUDE_PATH = /home/thrud/libraries/imgui
 
-CFLAGS = -std=c++17 -I$(VULKAN_SDK_PATH)/include -I$(STB_INCLUDE_PATH) -I$(TINYOBJ_INCLUDE_PATH) 
+CFLAGS = -std=c++17 -I$(VULKAN_SDK_PATH)/include -I$(STB_INCLUDE_PATH) -I$(TINYOBJ_INCLUDE_PATH) -O3
 LDFLAGS = -L$(VULKAN_SDK_PATH)/lib `pkg-config --static --libs glfw3` -lvulkan
 
 VulkanTest: 
