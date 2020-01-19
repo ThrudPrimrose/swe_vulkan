@@ -5,23 +5,21 @@
 #include <GLFW/glfw3.h>
 
 #include <iostream>
-
-
+#include <utility> 
 enum MoveInfo{
     UP,DOWN,LEFT,RIGHT,ZIN,ZOUT,NOPE
 };
 
-class gui {
+class Gui {
     private:
-    GLFWwindow* window;
-    
     static void key_callback_press(GLFWwindow* window, int key, int scancode, int action, int mods);
 
     public:
     VkSurfaceKHR surface;
     static MoveInfo move_msg;
-    int HEIGHT = 600;
-    int WIDTH = 800;
+    std::pair <int,int> size;
+    GLFWwindow* window;
+    static bool framebufferResized;
 
 
     void initWindow();
@@ -29,9 +27,12 @@ class gui {
     MoveInfo poll();
     void killWindow();
     void createSurface(VkInstance instance);
+    void querysizes(int *width, int *height);
+    static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
+
+    void inqChange(int &height, int &width);
     
 };
 
-//MoveInfo gui::move_msg;
 
 #endif

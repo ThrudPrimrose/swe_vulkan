@@ -1,17 +1,19 @@
 #include "gui.hpp"
 
-MoveInfo gui::move_msg = NOPE; //why here?
+MoveInfo Gui::move_msg = NOPE; //why here?
+bool Gui::framebufferResized = false;
 
-
-void gui::initWindow(){
+void Gui::initWindow(){
     glfwInit();
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-    window = glfwCreateWindow(800, 600, "Vulkan", nullptr, nullptr);
+    window = glfwCreateWindow(size.first,size.second, "Vulkan", nullptr, nullptr);
     glfwSetKeyCallback(window,key_callback_press); //set callback for press actions
+    glfwSetWindowUserPointer(window, this);
+    glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
+    
 }
 
-bool gui::shouldClose(){
+bool Gui::shouldClose(){
     if (glfwWindowShouldClose(window)){
         return true;
     }else {
@@ -19,13 +21,13 @@ bool gui::shouldClose(){
     }
 }
 
-MoveInfo gui::poll(){
+MoveInfo Gui::poll(){
     glfwPollEvents();
     //TODO: MOVEMENT ACTIONS
     return NOPE;
 }
 
-void gui::key_callback_press(GLFWwindow* window, int key, int scancode, int action, int mods)
+void Gui::key_callback_press(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
     if (key == GLFW_KEY_UP && action ==GLFW_PRESS){
         move_msg = UP;
@@ -34,13 +36,26 @@ void gui::key_callback_press(GLFWwindow* window, int key, int scancode, int acti
 }
 
 
-void gui::createSurface(VkInstance instance){
+void Gui::createSurface(VkInstance instance){
     if (glfwCreateWindowSurface(instance, window, nullptr, &surface) != VK_SUCCESS) {
         throw std::runtime_error("failed to create window surface!");
     }
 }
 
-void gui::killWindow(){
+void Gui::querysizes(int* width, int* height){
+    glfwGetFramebufferSize(window, width, height);
+}
+
+void Gui::killWindow(){
     glfwDestroyWindow(window);
     glfwTerminate();
 }
+
+void Gui::framebufferResizeCallback(GLFWwindow* window, int width, int height) {
+    framebufferResized = true;
+}
+
+void Gui::inqChange(int &height, int &width){
+    glfwGetFramebufferSize(window, &width, &height);
+}
+
