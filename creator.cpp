@@ -3,46 +3,69 @@
 
 
 void Creator::cleanup(){
-    dev.cleanupSwapChain();
 
-    vkDestroySampler(dev.logicDevice, dev.textureSampler, nullptr);
-    vkDestroyImageView(dev.logicDevice, dev.textureImageView, nullptr);
+    //clean gui objects
+    //vkDestroyDescriptorPool(dev.logicDevice,gui.guiDescriptorPool,nullptr);
+    //vkDestroyRenderPass(dev.logicDevice,dev.guiRenderPass,nullptr);
+    //ImGui_ImplVulkanH_DestroyWindow(instance, dev.logicDevice,
+    //&(gui.guiObjWindow), nullptr);
+    //finished cleaning gui objects 
+    #ifdef TWOD 
+        gui.killWindow(dev);
+
+        dev.cleanupSwapChain();
+
+        for (int i=0; i<textureCount; i++){
+            vkDestroySampler(dev.logicDevice, dev.texture[i].textureSampler, nullptr);
+            vkDestroyImageView(dev.logicDevice, dev.texture[i].textureImageView, nullptr);
+            vkDestroyImage(dev.logicDevice, dev.texture[i].textureImage, nullptr);
+            vkFreeMemory(dev.logicDevice, dev.texture[i].textureImageMemory, nullptr);
+            vkDestroyBuffer(dev.logicDevice,dev.texture[i].tBuffer,nullptr);
+            vkFreeMemory(dev.logicDevice, dev.texture[i].tBufferMemory,nullptr);  
+            //device functions already delete them
+
+            //vkFreeMemory(dev.logicDevice,dev.texture[i].tiStagingBufferMemory,nullptr);
+            //vkDestroyBuffer(dev.logicDevice,dev.texture[i].tiStagingBuffer,nullptr);
+        }
+        
+
+        vkDestroyDescriptorSetLayout(dev.logicDevice, dev.descriptorSetLayout, nullptr);
+
+        vkDestroyBuffer(dev.logicDevice, dev.indexBuffer, nullptr);
+        vkFreeMemory(dev.logicDevice, dev.indexBufferMemory, nullptr);
+
+        for (size_t i = 0; i < dev.MAX_FRAMES_IN_FLIGHT; i++) {
+            vkDestroySemaphore(dev.logicDevice, dev.renderFinishedSemaphores[i], nullptr);
+            vkDestroySemaphore(dev.logicDevice, dev.imageAvailableSemaphores[i], nullptr);
+            vkDestroyFence(dev.logicDevice, dev.inFlightFences[i], nullptr);
+        }
+
+        vkDestroyCommandPool(dev.logicDevice, dev.commandPool, nullptr);
+
+        vkDestroyDevice(dev.logicDevice, nullptr);
+
+        if (enableValidationLayers) {
+                DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
+        }
+        
+        vkDestroySurfaceKHR(instance, gui.surface, nullptr);
+        vkDestroyInstance(instance, nullptr);
+    #else 
+    //means we got topdown 2d for now
+    #endif
     
-    vkDestroyImage(dev.logicDevice, dev.textureImage, nullptr);
-    vkFreeMemory(dev.logicDevice, dev.textureImageMemory, nullptr);
-
-    vkDestroyDescriptorSetLayout(dev.logicDevice, dev.descriptorSetLayout, nullptr);
-    vkDestroyBuffer(dev.logicDevice, dev.indexBuffer, nullptr);
-    vkFreeMemory(dev.logicDevice, dev.indexBufferMemory, nullptr);
-
-    vkDestroyBuffer(dev.logicDevice, dev.vertexBuffer, nullptr);
-    vkFreeMemory(dev.logicDevice, dev.vertexBufferMemory, nullptr);
-
-    for (size_t i = 0; i < dev.MAX_FRAMES_IN_FLIGHT; i++) {
-        vkDestroySemaphore(dev.logicDevice, dev.renderFinishedSemaphores[i], nullptr);
-        vkDestroySemaphore(dev.logicDevice, dev.imageAvailableSemaphores[i], nullptr);
-        vkDestroyFence(dev.logicDevice, dev.inFlightFences[i], nullptr);
-    }
-
-    vkDestroyCommandPool(dev.logicDevice, dev.commandPool, nullptr);
-
-    vkDestroyDevice(dev.logicDevice, nullptr);
-
-    if (enableValidationLayers) {
-            DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
-    }
-    vkDestroySurfaceKHR(instance, gui.surface, nullptr);
-    vkDestroyInstance(instance, nullptr);
-    gui.killWindow();
 }
 
 void Creator::mainLoop(){
     while(!gui.shouldClose()){
         gui.poll();
         drawFrame();
+        //gui.drawObjects(dev);
     }
     vkDeviceWaitIdle(dev.logicDevice);
 }
+
+
 
 void Creator::createInstance(){
        if (enableValidationLayers && !checkValidationLayerSupport()) {
@@ -87,25 +110,38 @@ void Creator::initVulkan(){
     createInstance();
     setupDebugMessenger();
     gui.createSurface(instance);
-    dev.pickPhysicalDevice(instance,gui.surface);
-    dev.createLogicalDevice(enableValidationLayers, validationLayers,gui.surface);
-    dev.createSwapChain(gui.surface);
-    dev.createImageViews();
-    dev.createRenderPass();
-    dev.createDescriptorSetLayout();
-    dev.createGraphicsPipeline();
-    dev.createFramebuffers();
-    dev.createCommandPool(gui.surface);
-    dev.createTextureImage();
-    dev.createTextureImageView();
-    dev.createTextureSampler();
-    dev.createVertexBuffer();
-    dev.createIndexBuffer();
-    dev.createUniformBuffers();
-    dev.createDescriptorPool();
-    dev.createDescriptorSets();
-    dev.createCommandBuffers();
-    dev.createSyncObjects();
+    #ifndef TWOD
+        dev.pickPhysicalDevice(instance,gui.surface);
+        dev.createLogicalDevice(enableValidationLayers, validationLayers,gui.surface);
+        dev.createSwapChain(gui.surface);
+        dev.createImageViews();
+        dev.createRenderPass();
+        dev.createDescriptorSetLayout();
+        dev.createGraphicsPipeline();
+        dev.createFramebuffers();
+        dev.createCommandPool(gui.surface);
+
+        for(dev.tInd=0; dev.tInd<textureCount; dev.tInd++){
+            dev.createTextureImage(textureNames[dev.tInd]);
+            dev.createTextureImageView();
+            dev.createTextureSampler();
+            dev.createVertexBuffer();
+        }
+        dev.createIndexBuffer();
+    
+        dev.createUniformBuffers();
+        dev.createDescriptorPool();
+
+        for(dev.tInd=0; dev.tInd<textureCount; dev.tInd++){
+            dev.createDescriptorSets();
+        }
+        
+        dev.createCommandBuffers();
+        dev.createSyncObjects();
+    #else
+    //means top down 2d for now
+
+    #endif
 }
 
 
@@ -116,6 +152,8 @@ void Creator::run(){
     gui.size.second=height;
     gui.initWindow();
     initVulkan();
+    //gui.setupImguiContext(dev,instance,dev.graphicsQueue);
+    //gui.createGuiRenderPass(dev);
     mainLoop();
     cleanup();
 }
@@ -209,9 +247,11 @@ void Creator::drawFrame() {
         uint32_t imageIndex;
         VkResult result = vkAcquireNextImageKHR(dev.logicDevice, dev.swapChain, UINT64_MAX, 
         dev.imageAvailableSemaphores[dev.currentFrame], VK_NULL_HANDLE, &imageIndex);
-
         if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+            gui.framebufferResized=false; 
             dev.recreateSwapChain(gui.window,gui.surface);
+            gui.rebuild(dev,instance);
+            std::cout<<"changing framebuffer"<<std::endl;
             return;
         } else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
             throw std::runtime_error("failed to acquire swap chain image!");

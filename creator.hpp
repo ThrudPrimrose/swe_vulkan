@@ -10,6 +10,7 @@
 #include <string.h>
 #include "gui.hpp"
 #include "device.hpp"
+#include "deviceTexture.hpp"
 
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
@@ -38,8 +39,13 @@ private:
     Gui gui;
     VkInstance instance;
     VkDebugUtilsMessengerEXT debugMessenger;
-    Device dev;
-
+    DeviceTexture dev;
+    int textureCount = 2; //total count of textures to be loaded
+    //device loads textures with functions of 0 zero arguments
+    //but the functions depends on tInd count
+    //which governed by creator through appropriate calls
+    std::vector<std::string> textureNames = {"textures/ground.png", 
+    "textures/water.png"};
     int height=600;
     int width=800;
 

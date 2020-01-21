@@ -29,3 +29,4 @@ std::array<VkVertexInputAttributeDescription, 3> Vertex::getAttributeDescription
         return attributeDescriptions;
 }
 
+
