@@ -10,10 +10,13 @@
 #include "helper.hpp"
 #include <string.h> 
 #include "struct.hpp"
+#include "vArrays.hpp"
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
 #include <vulkan/vulkan.h>
+
+#include "netcdfHelpers.hpp"
 
 struct SwapChainSupportDetails {
     VkSurfaceCapabilitiesKHR capabilities;

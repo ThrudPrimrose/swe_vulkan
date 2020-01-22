@@ -1,0 +1,3 @@
+[submodule "temp_netcdfreader"]
+	path = temp_netcdfreader
+	url = git@gitlab.lrz.de:ge69vuw/temp_netcdfreader.git
