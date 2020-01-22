@@ -10,7 +10,7 @@ void Creator::cleanup(){
     //ImGui_ImplVulkanH_DestroyWindow(instance, dev.logicDevice,
     //&(gui.guiObjWindow), nullptr);
     //finished cleaning gui objects 
-    #ifdef TWOD 
+    #ifndef TWOD 
         gui.killWindow(dev);
 
         dev.cleanupSwapChain();
@@ -70,25 +70,26 @@ void Creator::mainLoop(){
 
 void Creator::changeView(MoveInfo move_msg){
     switch (move_msg){
-        /*case UP : lookY += 0.5f;
+        case UP : lookY += 0.5f;
         break;
         case DOWN : lookY -= 0.5f;
         break;
         case RIGHT : lookX += 0.5f;
         break;
         case LEFT : lookX -= 0.5f;
-        break;*/
-        case ZIN : angle -= 15.0f;
         break;
-        case ZOUT : angle += 15.0f;
+        case ZIN : lookZ -= 1.0f;
         break;
-       /* case AP : angle -= 15.0f;
+        case ZOUT : lookZ += 1.0f;
+        break;
+        case AP : angle -= 15.0f;
         break;
         case AM : angle += 15.0f;
         break;
         case NOPE : //Do nozhing
-        break;*/
+        break;
     }
+    std::cout<<lookY<<" "<<lookX<<" "<<lookZ<<std::endl;
 }
 
 
@@ -165,7 +166,22 @@ void Creator::initVulkan(){
         dev.createSyncObjects();
     #else
     //means top down 2d for now
-
+        dev.pickPhysicalDevice(instance,gui.surface);
+        dev.createLogicalDevice(enableValidationLayers, validationLayers,gui.surface);
+        dev.createSwapChain(gui.surface);
+        dev.createImageViews();
+        dev.createRenderPass();
+        dev.createDescriptorSetLayout();
+        dev.createGraphicsPipeline();
+        dev.createFramebuffers();
+        dev.createCommandPool(gui.surface);
+        dev.createVertexBuffer();
+        dev.createIndexBuffer();
+        dev.createUniformBuffers();
+        dev.createDescriptorPool();
+        dev.createDescriptorSets();
+        dev.createCommandBuffers();
+        dev.createSyncObjects();
     #endif
 }
 
@@ -343,9 +359,10 @@ void Creator::updateUniformBuffer(uint32_t currentImage) {
 
     UniformBufferObject ubo = {};
     //glm::rotate(glm::mat4(1.0f), time * glm::radians(0.f), glm::vec3(0.0f, 0.0f, 1.0f));
-    ubo.view = glm::mat4(1.0f);
-    ubo.model = glm::lookAt(glm::vec3(lookX, lookY, lookZ), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-    ubo.proj = glm::perspective(glm::radians(angle), dev.swapChainExtent.width / (float) dev.swapChainExtent.height, 0.1f, 10.0f);
+    ubo.model =  glm::mat4(1.0f);
+   
+    ubo.view = glm::lookAt(glm::vec3(lookX, lookY, lookZ), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.0f, 0.0f, 1.0f));
+    ubo.proj = glm::perspective(glm::radians(angle), dev.swapChainExtent.width / (float) dev.swapChainExtent.height, 0.001f, 99999.0f);
     ubo.proj[1][1] *= -1;   
 
     void* data;

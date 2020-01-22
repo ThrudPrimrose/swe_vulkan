@@ -63,7 +63,7 @@ void Gui::querysizes(int* width, int* height){
     glfwGetFramebufferSize(window, width, height);
 }
 
-void Gui::killWindow(DeviceTexture dev){
+void Gui::killWindow(Device dev){
     //ImGui_ImplVulkan_Shutdown();
     //ImGui_ImplGlfw_Shutdown();
     //ImGui::DestroyContext();
@@ -80,7 +80,7 @@ void Gui::inqChange(int &height, int &width){
     glfwGetFramebufferSize(window, &width, &height);
 }
 
-void Gui::setupImguiContext(DeviceTexture dev, VkInstance instance, VkQueue guiQueue){
+void Gui::setupImguiContext(Device dev, VkInstance instance, VkQueue guiQueue){
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
@@ -110,7 +110,7 @@ void Gui::setupImguiContext(DeviceTexture dev, VkInstance instance, VkQueue guiQ
     
 }
 
-void Gui::createGuiDPool(DeviceTexture dev, VkQueue guiQueue){
+void Gui::createGuiDPool(Device dev, VkQueue guiQueue){
  VkDescriptorPoolSize pool_sizes[] =
         {
             { VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
@@ -136,7 +136,7 @@ void Gui::createGuiDPool(DeviceTexture dev, VkQueue guiQueue){
         check_vk_result(err);
 }
 
-void Gui::createGuiRenderPass(DeviceTexture dev){
+void Gui::createGuiRenderPass(Device dev){
     VkAttachmentDescription attachment = {};
     attachment.format = dev.swapChainImageFormat;
     attachment.samples = VK_SAMPLE_COUNT_1_BIT;
@@ -187,7 +187,7 @@ void Gui::check_vk_result(VkResult x){
     }
 }
 
-void Gui::drawObjects(DeviceTexture dev){
+void Gui::drawObjects(Device dev){
     ImGui_ImplVulkan_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
@@ -201,7 +201,7 @@ void Gui::drawObjects(DeviceTexture dev){
 }
 
 
-void Gui::FrameRender(ImGui_ImplVulkanH_Window* wd, DeviceTexture dev){
+void Gui::FrameRender(ImGui_ImplVulkanH_Window* wd, Device dev){
     //this parts results in segmentation fault
     /*VkSemaphore image_acquired_semaphore  = wd->FrameSemaphores[wd->SemaphoreIndex].ImageAcquiredSemaphore;
     VkSemaphore render_complete_semaphore = wd->FrameSemaphores[wd->SemaphoreIndex].RenderCompleteSemaphore;
@@ -221,7 +221,7 @@ void Gui::FrameRender(ImGui_ImplVulkanH_Window* wd, DeviceTexture dev){
 
 
 //rebuilds the gui object for the window
-void Gui::rebuild(DeviceTexture dev,VkInstance instance){
+void Gui::rebuild(Device dev,VkInstance instance){
     int height,width;
     glfwGetFramebufferSize(window,&height,&width);
 
@@ -233,7 +233,7 @@ void Gui::rebuild(DeviceTexture dev,VkInstance instance){
 
 }
 
-void Gui::createGuiCommandPool(DeviceTexture dev,VkCommandPool* commandPool, VkCommandPoolCreateFlags flags) {
+void Gui::createGuiCommandPool(Device dev,VkCommandPool* commandPool, VkCommandPoolCreateFlags flags) {
     VkCommandPoolCreateInfo commandPoolCreateInfo = {};
     commandPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
     commandPoolCreateInfo.queueFamilyIndex = dev.qFamilyInd;
@@ -244,7 +244,7 @@ void Gui::createGuiCommandPool(DeviceTexture dev,VkCommandPool* commandPool, VkC
     }
 }
 
-void Gui::createGuiCommandBuffers(DeviceTexture dev, VkCommandBuffer* commandBuffer, uint32_t commandBufferCount, VkCommandPool &commandPool) {
+void Gui::createGuiCommandBuffers(Device dev, VkCommandBuffer* commandBuffer, uint32_t commandBufferCount, VkCommandPool &commandPool) {
     VkCommandBufferAllocateInfo commandBufferAllocateInfo = {};
     commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;

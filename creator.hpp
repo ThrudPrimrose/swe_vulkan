@@ -10,7 +10,12 @@
 #include <string.h>
 #include "gui.hpp"
 #include "device.hpp"
+
+#ifdef TWOD
+#include "device2D.hpp"
+#else
 #include "deviceTexture.hpp"
+#endif 
 
 #define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
@@ -39,7 +44,13 @@ private:
     Gui gui;
     VkInstance instance;
     VkDebugUtilsMessengerEXT debugMessenger;
+    
+    #ifdef TWOD
+    Device2D dev;
+    #else
     DeviceTexture dev;
+    #endif 
+
     int textureCount = 2; //total count of textures to be loaded
     //device loads textures with functions of 0 zero arguments
     //but the functions depends on tInd count
@@ -50,10 +61,10 @@ private:
     int width=800;
 
     float rotSpeed = 90.0f;
-    float lookX = 0.0f;
-    float lookY = 2.0f;
-    float lookZ = 2.0f;
-    float angle = 0.0f;
+    float lookX = 1.f;
+    float lookY = 0.5f;
+    float lookZ = 50.0f;
+    float angle = 90.0f;
 
     void initWindow();
     void initVulkan();

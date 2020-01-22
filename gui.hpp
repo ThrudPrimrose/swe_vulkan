@@ -11,7 +11,12 @@
 #include <examples/imgui_impl_vulkan.h>
 #include <examples/imgui_impl_glfw.h>
 
+#ifdef TWOD
+#include "device2D.hpp"
+#else
 #include "deviceTexture.hpp"
+#endif 
+
 #include "device.hpp"
 
 class Gui {
@@ -34,22 +39,22 @@ class Gui {
     void initWindow();
     bool shouldClose();
     MoveInfo poll();
-    void killWindow(DeviceTexture dev);
+    void killWindow(Device dev);
     void createSurface(VkInstance instance);
     void querysizes(int *width, int *height);
     static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 
     void inqChange(int &height, int &width);
 
-    void setupImguiContext(DeviceTexture dev, VkInstance instance, VkQueue guiQueue);
-    void createGuiDPool(DeviceTexture dev, VkQueue guiQueue);
-    void createGuiRenderPass(DeviceTexture dev);
-    void rebuild(DeviceTexture dev,VkInstance instance);
-    void drawObjects(DeviceTexture dev);
+    void setupImguiContext(Device dev, VkInstance instance, VkQueue guiQueue);
+    void createGuiDPool(Device dev, VkQueue guiQueue);
+    void createGuiRenderPass(Device dev);
+    void rebuild(Device dev,VkInstance instance);
+    void drawObjects(Device dev);
     static void check_vk_result(VkResult x);
-    void FrameRender(ImGui_ImplVulkanH_Window* guiObjWindow, DeviceTexture dev);
-    void createGuiCommandPool(DeviceTexture dev,VkCommandPool* commandPool, VkCommandPoolCreateFlags flags);
-    void createGuiCommandBuffers(DeviceTexture dev,VkCommandBuffer* commandBuffer, uint32_t commandBufferCount, VkCommandPool &commandPool);
+    void FrameRender(ImGui_ImplVulkanH_Window* guiObjWindow, Device dev);
+    void createGuiCommandPool(Device dev,VkCommandPool* commandPool, VkCommandPoolCreateFlags flags);
+    void createGuiCommandBuffers(Device dev,VkCommandBuffer* commandBuffer, uint32_t commandBufferCount, VkCommandPool &commandPool);
 
 };
 

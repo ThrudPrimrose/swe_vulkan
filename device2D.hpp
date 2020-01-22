@@ -4,6 +4,7 @@
 #include "device.hpp"
 
 class Device2D : public Device {
+    public:
     //in texture we initialized these per texture
     VkDescriptorPool descriptorPool;
     std::vector<VkDescriptorSet> descriptorSets;
