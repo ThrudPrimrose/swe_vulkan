@@ -49,6 +49,12 @@ private:
     int height=600;
     int width=800;
 
+    float rotSpeed = 90.0f;
+    float lookX = 0.0f;
+    float lookY = 2.0f;
+    float lookZ = 2.0f;
+    float angle = 0.0f;
+
     void initWindow();
     void initVulkan();
     void mainLoop();
@@ -56,6 +62,7 @@ private:
     void createInstance();
     void drawFrame();
     void updateUniformBuffer(uint32_t currentImage);
+    void changeView(MoveInfo move_msg);
 
     static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, 
     const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData);

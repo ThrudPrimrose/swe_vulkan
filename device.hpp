@@ -11,7 +11,6 @@
 #include <string.h> 
 #include "struct.hpp"
 #include "device.hpp"
-
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
@@ -34,6 +33,10 @@ struct QueueFamilyIndices {
     bool isComplete() {
         return graphicsFamily.has_value() && presentFamily.has_value();
     }
+};
+
+enum MoveInfo : uint32_t {
+    UP,DOWN,RIGHT,LEFT,ZIN,ZOUT,NOPE,AP,AM
 };
 
 class Device {
@@ -113,6 +116,7 @@ class Device {
 
     VkCommandBuffer beginSingleTimeCommands();
     void endSingleTimeCommands(VkCommandBuffer commandBuffer);
+
 
 };
 

@@ -22,16 +22,33 @@ bool Gui::shouldClose(){
 }
 
 MoveInfo Gui::poll(){
+    move_msg = NOPE;
     glfwPollEvents();
     //TODO: MOVEMENT ACTIONS
-    return NOPE;
+    return move_msg;
 }
 
 void Gui::key_callback_press(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
     if (key == GLFW_KEY_UP && action ==GLFW_PRESS){
         move_msg = UP;
-           std::cout<<"pressed up"<<std::endl;
+        //std::cout<<"pressed up"<<std::endl;
+    }else if (key == GLFW_KEY_DOWN && action ==GLFW_PRESS){
+        move_msg = DOWN;    
+    }else if (key == GLFW_KEY_LEFT && action ==GLFW_PRESS){
+        move_msg = LEFT; 
+    }else if (key == GLFW_KEY_RIGHT && action ==GLFW_PRESS){
+        move_msg = RIGHT;
+    }else if (key == GLFW_KEY_I && action ==GLFW_PRESS){
+        move_msg = ZIN;
+    }else if (key == GLFW_KEY_O && action ==GLFW_PRESS){
+        move_msg = ZOUT;
+    }else if (key == GLFW_KEY_KP_ADD && action ==GLFW_PRESS){
+        move_msg = AP;
+    }else if (key == GLFW_KEY_KP_SUBTRACT && action ==GLFW_PRESS){
+        move_msg = AM;
+    }else{
+        move_msg = NOPE;
     }
 }
 

@@ -58,13 +58,38 @@ void Creator::cleanup(){
 
 void Creator::mainLoop(){
     while(!gui.shouldClose()){
-        gui.poll();
+        MoveInfo move_msg = gui.poll();
+        if (move_msg!=NOPE){
+            changeView(move_msg);
+        }
         drawFrame();
         //gui.drawObjects(dev);
     }
     vkDeviceWaitIdle(dev.logicDevice);
 }
 
+void Creator::changeView(MoveInfo move_msg){
+    switch (move_msg){
+        /*case UP : lookY += 0.5f;
+        break;
+        case DOWN : lookY -= 0.5f;
+        break;
+        case RIGHT : lookX += 0.5f;
+        break;
+        case LEFT : lookX -= 0.5f;
+        break;*/
+        case ZIN : angle -= 15.0f;
+        break;
+        case ZOUT : angle += 15.0f;
+        break;
+       /* case AP : angle -= 15.0f;
+        break;
+        case AM : angle += 15.0f;
+        break;
+        case NOPE : //Do nozhing
+        break;*/
+    }
+}
 
 
 void Creator::createInstance(){
@@ -317,9 +342,10 @@ void Creator::updateUniformBuffer(uint32_t currentImage) {
     float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
     UniformBufferObject ubo = {};
-    ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-    ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-    ubo.proj = glm::perspective(glm::radians(45.0f), dev.swapChainExtent.width / (float) dev.swapChainExtent.height, 0.1f, 10.0f);
+    //glm::rotate(glm::mat4(1.0f), time * glm::radians(0.f), glm::vec3(0.0f, 0.0f, 1.0f));
+    ubo.view = glm::mat4(1.0f);
+    ubo.model = glm::lookAt(glm::vec3(lookX, lookY, lookZ), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    ubo.proj = glm::perspective(glm::radians(angle), dev.swapChainExtent.width / (float) dev.swapChainExtent.height, 0.1f, 10.0f);
     ubo.proj[1][1] *= -1;   
 
     void* data;

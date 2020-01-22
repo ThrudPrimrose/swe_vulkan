@@ -14,10 +14,6 @@
 #include "deviceTexture.hpp"
 #include "device.hpp"
 
-enum MoveInfo{
-    UP,DOWN,LEFT,RIGHT,ZIN,ZOUT,NOPE,REBUILD
-};
-
 class Gui {
     private:
     static void key_callback_press(GLFWwindow* window, int key, int scancode, int action, int mods);
