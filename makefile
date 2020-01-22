@@ -3,12 +3,13 @@ STB_INCLUDE_PATH = /home/$$USERNAME/libraries/stb
 TINYOBJ_INCLUDE_PATH = /home/$$USERNAME/libraries/tinyobjloader
 IMGUI_INCLUDE_PATH = /home/$$USERNAME/libraries/imgui
 IMGUI_EXMPL_INCLUDE_PATH = /home/$$USERNAME/libraries/imgui/examples
+NETCDF = /usr/local
 
-CFLAGS = -std=c++17 -I$(VULKAN_SDK_PATH)/include -I$(STB_INCLUDE_PATH) -I$(TINYOBJ_INCLUDE_PATH)  -I$(IMGUI_INCLUDE_PATH) -I$(IMGUI_EXMPL_INCLUDE_PATH) -O3
-LDFLAGS = -L$(VULKAN_SDK_PATH)/lib  -L$(TINYOBJ_INCLUDE_PATH) ` pkg-config --static --libs glfw3` -lvulkan
+CFLAGS = -std=c++17 -I$(VULKAN_SDK_PATH)/include -I$(STB_INCLUDE_PATH) -I$(TINYOBJ_INCLUDE_PATH)  -I$(IMGUI_INCLUDE_PATH) -I$(IMGUI_EXMPL_INCLUDE_PATH) -I$(NETCDF)/include -O3
+LDFLAGS = -L$(VULKAN_SDK_PATH)/lib  -L$(TINYOBJ_INCLUDE_PATH) -L$(NETCDF)/lib ` pkg-config --static --libs glfw3` -lvulkan 
 
 VulkanTest: 
-	g++ $(CFLAGS) $(LDFLAGS) -o VulkanTest *.cpp 
+	g++ -Wl,-rpath=/usr/local/lib $(CFLAGS)  -letcdf $(LDFLAGS) -o VulkanTest *.cpp  
 
 .PHONY: test clean
 
@@ -23,7 +24,7 @@ ruin: goliath
 	./goliath
 
 goliath: 
-	g++ $(CFLAGS) -o goliath goliath.cpp  $(LDFLAGS)
+	g++ -Wl,-rpath=/usr/local/lib $(CFLAGS) -o goliath goliath.cpp  -lnetcdf $(LDFLAGS)
 
 clean:
 	rm -f VulkanTest
@@ -33,5 +34,5 @@ tidy:
 	rm -f goliath
 
 twod:
-	g++ -D TWOD $(CFLAGS) $(LDFLAGS) -o twod *.cpp
+	g++ -Wl,-rpath=/usr/local/lib -D TWOD $(CFLAGS) -lnetcdf $(LDFLAGS) -o twod *.cpp  
 	./twod

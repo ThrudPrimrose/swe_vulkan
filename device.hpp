@@ -11,6 +11,8 @@
 #include <string.h> 
 #include "struct.hpp"
 #include "vArrays.hpp"
+#include "ncReader.hpp"
+
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
