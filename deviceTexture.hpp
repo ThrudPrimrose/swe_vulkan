@@ -54,6 +54,7 @@ class DeviceTexture : public Device {
     void createCommandBuffers(); //changed for texture
     
     void createVertexBuffer(); //changed for texture
+    void createDescriptorSetLayout();
     void createIndexBuffer();
     void createCommandPool(VkSurfaceKHR surface);
     

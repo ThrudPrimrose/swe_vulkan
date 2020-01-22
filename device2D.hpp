@@ -23,6 +23,7 @@ class Device2D : public Device {
 
     void createDescriptorPool();
     void createDescriptorSets();
+    void createDescriptorSetLayout();
     void recreateSwapChain(GLFWwindow* window, 
     VkSurfaceKHR surface);
     void createImageViews();

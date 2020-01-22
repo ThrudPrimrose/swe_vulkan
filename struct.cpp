@@ -1,4 +1,5 @@
 #include "struct.hpp"
+
 VkVertexInputBindingDescription Vertex::getBindingDescription() {
         VkVertexInputBindingDescription bindingDescription = {};
         bindingDescription.binding = 0;
@@ -28,5 +29,3 @@ std::array<VkVertexInputAttributeDescription, 3> Vertex::getAttributeDescription
 
         return attributeDescriptions;
 }
-
-

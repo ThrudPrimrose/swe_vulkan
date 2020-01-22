@@ -10,7 +10,6 @@
 #include "helper.hpp"
 #include <string.h> 
 #include "struct.hpp"
-#include "device.hpp"
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
@@ -76,8 +75,6 @@ class Device {
 
     GLFWwindow* window;
     VkMemoryRequirements memRequirements;
-  
- 
 
     std::vector<VkBuffer> uniformBuffers;
     std::vector<VkDeviceMemory> uniformBuffersMemory;
@@ -93,7 +90,7 @@ class Device {
     void createSwapChain(VkSurfaceKHR surface);
     void createRenderPass();
     void createFramebuffers();
-    void createDescriptorSetLayout();
+    
     void createUniformBuffers();
     void createIndexBuffer();
     void createSyncObjects();

@@ -11,6 +11,7 @@ void Creator::cleanup(){
     //&(gui.guiObjWindow), nullptr);
     //finished cleaning gui objects 
     #ifndef TWOD 
+        /*
         gui.killWindow(dev);
 
         dev.cleanupSwapChain();
@@ -23,17 +24,15 @@ void Creator::cleanup(){
             vkDestroyBuffer(dev.logicDevice,dev.texture[i].tBuffer,nullptr);
             vkFreeMemory(dev.logicDevice, dev.texture[i].tBufferMemory,nullptr);  
             //device functions already delete them
-
-            //vkFreeMemory(dev.logicDevice,dev.texture[i].tiStagingBufferMemory,nullptr);
             //vkDestroyBuffer(dev.logicDevice,dev.texture[i].tiStagingBuffer,nullptr);
+            //vkFreeMemory(dev.logicDevice,dev.texture[i].tiStagingBufferMemory,nullptr);
         }
-        
+
 
         vkDestroyDescriptorSetLayout(dev.logicDevice, dev.descriptorSetLayout, nullptr);
-
         vkDestroyBuffer(dev.logicDevice, dev.indexBuffer, nullptr);
         vkFreeMemory(dev.logicDevice, dev.indexBufferMemory, nullptr);
-
+       
         for (size_t i = 0; i < dev.MAX_FRAMES_IN_FLIGHT; i++) {
             vkDestroySemaphore(dev.logicDevice, dev.renderFinishedSemaphores[i], nullptr);
             vkDestroySemaphore(dev.logicDevice, dev.imageAvailableSemaphores[i], nullptr);
@@ -50,9 +49,14 @@ void Creator::cleanup(){
         
         vkDestroySurfaceKHR(instance, gui.surface, nullptr);
         vkDestroyInstance(instance, nullptr);
+        */
     #else 
     //means we got topdown 2d for now
+    //vkDestroyBuffer(dev.logicDevice, dev.vertexBuffer, nullptr);
+    //vkFreeMemory(dev.logicDevice, dev.vertexBufferMemory, nullptr);
     #endif
+
+    //clases clean themselves automatically -> when they go out of scope!?
     
 }
 
