@@ -343,3 +343,8 @@ void Device2D::createImageViews() {
             }
         }
 }
+
+
+void Device2D::initArrays(){
+    genereateFirstVertexLine(vertices,indices);
+}

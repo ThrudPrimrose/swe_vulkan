@@ -13,6 +13,7 @@
 
 #ifdef TWOD
 #include "device2D.hpp"
+#include "netcdfreader/ncReader.hpp"
 #else
 #include "deviceTexture.hpp"
 #endif 
@@ -61,10 +62,10 @@ private:
     int width=800;
 
     float rotSpeed = 90.0f;
-    float lookX = 1.f;
-    float lookY = 0.5f;
-    float lookZ = 50.0f;
-    float angle = 90.0f;
+    float lookX = 3.f;
+    float lookY = 3.f;
+    float lookZ = 3.0f;
+    float angle = 60.0f;
 
     void initWindow();
     void initVulkan();

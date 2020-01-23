@@ -13,6 +13,11 @@ class Device2D : public Device {
     VkBuffer vertexBuffer;
     VkDeviceMemory vertexBufferMemory;
 
+    NcReader ncReader; //this variant not like in swe has to be initialized
+
+    std::vector<Vertex> vertices;
+    std::vector<uint16_t> indices;
+
     void createGraphicsPipeline();
     
     void createCommandBuffers();
@@ -27,6 +32,7 @@ class Device2D : public Device {
     void recreateSwapChain(GLFWwindow* window, 
     VkSurfaceKHR surface);
     void createImageViews();
+    void initArrays();
 
 };
 

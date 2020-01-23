@@ -60,6 +60,21 @@ void Creator::cleanup(){
     
 }
 
+void Creator::run(){
+    gui.size.first=width;
+    gui.size.second=height;
+    gui.initWindow();
+    #ifdef TWOD
+    dev.ncReader.readAndInit("netcdfreader/a.nc","netcdfreader/b.nc");
+    dev.ncReader.createArrays();
+    #endif
+    initVulkan();
+    //gui.setupImguiContext(dev,instance,dev.graphicsQueue);
+    //gui.createGuiRenderPass(dev);
+    mainLoop();
+    cleanup();
+}
+
 void Creator::mainLoop(){
     while(!gui.shouldClose()){
         MoveInfo move_msg = gui.poll();
@@ -179,6 +194,7 @@ void Creator::initVulkan(){
         dev.createGraphicsPipeline();
         dev.createFramebuffers();
         dev.createCommandPool(gui.surface);
+        dev.initArrays();
         dev.createVertexBuffer();
         dev.createIndexBuffer();
         dev.createUniformBuffers();
@@ -187,20 +203,6 @@ void Creator::initVulkan(){
         dev.createCommandBuffers();
         dev.createSyncObjects();
     #endif
-}
-
-
-
-
-void Creator::run(){
-    gui.size.first=width;
-    gui.size.second=height;
-    gui.initWindow();
-    initVulkan();
-    //gui.setupImguiContext(dev,instance,dev.graphicsQueue);
-    //gui.createGuiRenderPass(dev);
-    mainLoop();
-    cleanup();
 }
 
 

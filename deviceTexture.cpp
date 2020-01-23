@@ -203,7 +203,7 @@ void DeviceTexture::recreateSwapChain(GLFWwindow* window,VkSurfaceKHR surface) {
     }
 
     void DeviceTexture::createIndexBuffer() {
-        VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
+        VkDeviceSize bufferSize = sizeof(indices3[0]) * indices3.size();
 
         VkBuffer stagingBuffer;
         VkDeviceMemory stagingBufferMemory;
@@ -211,7 +211,7 @@ void DeviceTexture::recreateSwapChain(GLFWwindow* window,VkSurfaceKHR surface) {
 
         void* data;
         vkMapMemory(logicDevice, stagingBufferMemory, 0, bufferSize, 0, &data);
-            memcpy(data, indices.data(), (size_t) bufferSize);
+            memcpy(data, indices3.data(), (size_t) bufferSize);
         vkUnmapMemory(logicDevice, stagingBufferMemory);
 
         createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, 
@@ -289,7 +289,7 @@ void DeviceTexture::recreateSwapChain(GLFWwindow* window,VkSurfaceKHR surface) {
             
             uint32_t watercount = static_cast<uint32_t>(water_indices.size());
             //vkCmdDraw(commandBuffers[i],, 1, 0, 0); //-> this form draws nothing, have to check
-            uint32_t indexcount = indices.size();
+            uint32_t indexcount = indices3.size();
             vkCmdDrawIndexed(commandBuffers[i], watercount, 1, 0, 0, 0);
             
             
