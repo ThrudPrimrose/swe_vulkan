@@ -4,6 +4,9 @@
 #include "device.hpp"
 
 class Device2D : public Device {
+    private:
+    NcReader ncReader; //this variant not like in swe has to be initialized
+
     public:
     //in texture we initialized these per texture
     VkDescriptorPool descriptorPool;
@@ -12,9 +15,6 @@ class Device2D : public Device {
     VkDeviceMemory indexBufferMemory;
     VkBuffer vertexBuffer;
     VkDeviceMemory vertexBufferMemory;
-
-    NcReader ncReader; //this variant not like in swe has to be initialized
-
     std::vector<Vertex> vertices;
     std::vector<uint16_t> indices;
 
@@ -33,6 +33,7 @@ class Device2D : public Device {
     VkSurfaceKHR surface);
     void createImageViews();
     void initArrays();
+    bool updateArrays();
 
 };
 

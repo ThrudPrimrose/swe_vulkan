@@ -344,7 +344,11 @@ void Device2D::createImageViews() {
         }
 }
 
-
 void Device2D::initArrays(){
-    genereateFirstVertexLine(vertices,indices);
+    ncReader.readAndInit("netcdfreader/o.nc");
+    ncReader.generateVertexArray(vertices,indices,true);
+}
+
+bool Device2D::updateArrays(){
+    return ncReader.updateVertexArray(vertices);
 }

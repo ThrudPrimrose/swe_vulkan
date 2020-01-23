@@ -64,13 +64,10 @@ void Creator::run(){
     gui.size.first=width;
     gui.size.second=height;
     gui.initWindow();
-    #ifdef TWOD
-    dev.ncReader.readAndInit("netcdfreader/a.nc","netcdfreader/b.nc");
-    dev.ncReader.createArrays();
-    #endif
     initVulkan();
     //gui.setupImguiContext(dev,instance,dev.graphicsQueue);
     //gui.createGuiRenderPass(dev);
+    start = std::chrono::steady_clock::now();
     mainLoop();
     cleanup();
 }
@@ -81,6 +78,22 @@ void Creator::mainLoop(){
         if (move_msg!=NOPE){
             changeView(move_msg);
         }
+        #ifdef TWOD
+        now = std::chrono::steady_clock::now();
+        if (std::chrono::duration_cast<std::chrono::seconds>(now - start).count()>0.5){
+            start = now;
+            drawFrame();
+            bool endreached = dev.updateArrays();
+            if (!endreached){
+                dev.createVertexBuffer();
+                dev.createIndexBuffer();
+                dev.createUniformBuffers();
+                dev.createDescriptorPool();
+                dev.createDescriptorSets();
+                dev.createCommandBuffers();
+            }
+        }
+        #endif
         drawFrame();
         //gui.drawObjects(dev);
     }

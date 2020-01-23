@@ -10,6 +10,7 @@
 #include <string.h>
 #include "gui.hpp"
 #include "device.hpp"
+#include <chrono>
 
 #ifdef TWOD
 #include "device2D.hpp"
@@ -62,10 +63,13 @@ private:
     int width=800;
 
     float rotSpeed = 90.0f;
-    float lookX = 3.f;
-    float lookY = 3.f;
-    float lookZ = 3.0f;
+    float lookX = 0.00f;
+    float lookY = 0.00f;
+    float lookZ = 4.0f;
     float angle = 60.0f;
+
+    std::chrono::steady_clock::time_point start;
+    std::chrono::steady_clock::time_point now;
 
     void initWindow();
     void initVulkan();
