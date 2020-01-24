@@ -9,7 +9,7 @@ CFLAGS = -std=c++17 -I$(VULKAN_SDK_PATH)/include -I$(STB_INCLUDE_PATH) -I$(TINYO
 LDFLAGS = -L$(VULKAN_SDK_PATH)/lib  -L$(TINYOBJ_INCLUDE_PATH) -L$(NETCDF)/lib ` pkg-config --static --libs glfw3` -lvulkan 
 
 VulkanTest: 
-	g++ -Wl,-rpath=/usr/local/lib $(CFLAGS)  -lnetcdf $(LDFLAGS) -o VulkanTest *.cpp  netcdfreader/ncReader.cpp
+	g++ -Wl,-rpath=/usr/local/lib $(CFLAGS)  -lnetcdf $(LDFLAGS) -o VulkanTest *.cpp  netcdfreader/*.cpp
 
 .PHONY: test clean
 
@@ -29,12 +29,19 @@ goliath:
 clean:
 	rm -f VulkanTest
 	rm -f twod
+	rm -f thrid
 
 tidy:
 	rm -f goliath
 
 twod:
-	g++ -Wl,-rpath=/usr/local/lib -D TWOD $(CFLAGS) -lnetcdf $(LDFLAGS) -o twod netcdfreader/ncReader.cpp *.cpp  
+	g++ -Wl,-rpath=/usr/local/lib -D TWOD $(CFLAGS) -lnetcdf $(LDFLAGS) -o twod netcdfreader/*.cpp *.cpp  
 	
 twodrun: twod
 	./twod
+
+thrid: 
+	g++ -Wl,-rpath=/usr/local/lib -D THRID $(CFLAGS) -lnetcdf $(LDFLAGS) -o thrid netcdfreader/*.cpp *.cpp  
+
+thridrun: thrid
+	./thrid

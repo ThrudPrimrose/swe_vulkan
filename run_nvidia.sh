@@ -12,7 +12,14 @@ then
 	    echo "compile 2D and run:"
 	    make clean
 	    make twod
-		make twodrun
+	    make twodrun
+	fi
+	if [ $2 == thrid ]
+	then 
+	    echo "compile 3D and run:"
+	    make clean
+	    make thid
+	    make thidrun
 	else
 	    echo "compile and run:"
 	    make clean
@@ -25,6 +32,13 @@ else
 	    echo "Second->" $2
 	    echo "only 2D run:"
 	    make twodrun
+	fi
+	if [ $2 == thrid ]
+	then
+	    echo "First->" $1
+	    echo "Second->" $2
+	    echo "only 3D run:"
+	    make thridrun
 	else
 	    echo "First->" $1
 	    echo "only run:"

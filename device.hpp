@@ -18,6 +18,11 @@
 
 #include <vulkan/vulkan.h>
 
+//right now device2d and device3d have 90% duplicated
+//code but trying to generate same file names
+//on parent class causes linker error , which
+// i dont want to solve right now!
+
 struct SwapChainSupportDetails {
     VkSurfaceCapabilitiesKHR capabilities;
     std::vector<VkSurfaceFormatKHR> formats;
@@ -85,7 +90,6 @@ class Device {
     //VkDescriptorPool guiDescriptorPool; //dPool for gui object
     VkDescriptorPool descriptorPool;
 
-
     void pickPhysicalDevice(VkInstance instance,VkSurfaceKHR surface);
     void cleanupSwapChain();
     void createLogicalDevice(bool enableValidationLayers,
@@ -95,7 +99,6 @@ class Device {
     void createFramebuffers();
     
     void createUniformBuffers();
-    void createIndexBuffer();
     void createSyncObjects();
     
     void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);

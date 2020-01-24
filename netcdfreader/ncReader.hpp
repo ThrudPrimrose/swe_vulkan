@@ -16,46 +16,42 @@
 #include "netcdfHelpers.hpp" 
 #include <vector> 
 #include "../struct.hpp"
+#include <glm/glm.hpp>
 
 #define error(e) {std::cout<<"error with number"<<e<<std::endl; exit(-1);}
 
-/*! \class SWE_ReadNetCDF
-* \brief Scenari that reads from the two input files
-*
-* Reads the information from two netcdf files and provides the implementations of funtions introduced in SWE_Scenario
-*/
 
-class NcReader {
-  private:
+
+//Reads from a netcdf array of input and output
+//build a static image of the t=0;
+class NcReader  {
+  protected:
+  glm::vec3 limegreen = {0.196, 0.804, 0.196};
+  glm::vec3 cyan = {0.08,0.92,0.97};
+  glm::vec3 white = {0.97,0.97,0.97};
+  glm::vec3 red = {0.97,0.08,0.08};
     
-    int timelimit; //!< timelimit of the scenario
-    int nxb; //!< Maximal x range of the displacement file
-    int nyb; //!< Maximal y range of the displacement file
-    int nya; //!< Maximal y range of the bathymetry file
-    int nxa; //!< Maximal x range of the bathymetry file
-     
-    std::vector<double> xvalafter;  //!< Dynamic array for the x values of the displacement file
-    std::vector<double> yvalafter;  //!< Dynamic array for the y values of the displacement file
-    std::vector<double> zvalafter;  //!< Dynamic array for the z values (= b(x,y)) of the displacement file, maps 2D array to 1D
+    int nx; //!< Size of the x-coordinates array
+    int ny; //!< Size of the y-coordinates array
 
-    std::vector<double> xvalbefore;  //!< Dynamic array for the x values of the bathymetry file
-    std::vector<double> yvalbefore; //!< Dynamic array for the y values of the bathymetry file
-    std::vector<double> zvalbefore; //!< Dynamic array for the z values (= b(x,y)) of the bathymetry file,maps 2D array to 1D
-  
-   
-    /*
-    double* xvalafter;
-    double* yvalafter;
-    double* zvalafter;
-
-    double* xvalbefore;
-    double*yvalbefore;
-    double* zvalbefore;
-    */
-
-    bool init=false; //!< Boolean that checks wether the dynamic arrays were initiliazed
+    std::vector<float> h_vec; //!< Dynamic array for waterheights, maps 2D h array to 1D
+    std::vector<float> b_vec; //!< Dynamic array for bathymetry values, maps 2D h array to 1D
+    std::vector<float> times_vec; //!< Dynamic array for simulation times for timesteps
     
+    bool init = false; //!< Boolean for initialization of the dynamic arrays 
+    bool generatedValues = false;
+    float timelimit; //!< Endtime for the simulation
+
+    int l_bound; //!< Boundary type of the left edge
+    int r_bound; //!< Boundary type of the right edge
+    int t_bound; //!< Boundary type of the top edge
+    int b_bound; //!< Boudnary type of the bottom edge
+
+    int curtimestep = 0; //!< Timestep of the last checkpoint
+    int maxGeneratedTime = 0;
+    float curtime; //!< The simulation time of the last checkpoint
   
+    
   public:
   std::vector<Vertex> vertexArray;
   std::vector<uint16_t> indexArray;
@@ -63,11 +59,19 @@ class NcReader {
   std::string afterquake ; //!< Stores the name of the bathymetry file
   std::string beforequake ; //!< Stores the name of the displacement file
   
-  int readAndInit(std::string b,std::string a);
-  void createArrays();
-  float getBathymetry(float x, float y);
-  float getWaterHeight(float x, float y);
-
+  void readAndInit(std::string b);
+  float getBathymetry(int x, int y);
+  float getWaterHeight(int x, int y);
+  float getWaterHeight(int x, int y, int time);
+ 
+  int getTimeStep();
+  float getTime();
+  int getLNX();
+  int getLNY();
+ 
+  float max(float a,float b);
+  float min(float a,float b);
+  float abs(float a,float b);
 
 };
 

@@ -13,10 +13,15 @@
 #include <chrono>
 
 #ifdef TWOD
-#include "device2D.hpp"
-#include "netcdfreader/ncReader.hpp"
+    #include "device2D.hpp"
+    #include "netcdfreader/ncReader2D.hpp"
 #else
-#include "deviceTexture.hpp"
+    #ifdef THRID
+        #include "device3D.hpp"
+        #include "netcdfreader/ncReader3D.hpp"
+    #else
+        #include "deviceTexture.hpp"
+    #endif
 #endif 
 
 #define GLM_FORCE_RADIANS
@@ -48,9 +53,13 @@ private:
     VkDebugUtilsMessengerEXT debugMessenger;
     
     #ifdef TWOD
-    Device2D dev;
+        Device2D dev;
     #else
-    DeviceTexture dev;
+        #ifdef THRID
+            Device3D dev;
+        #else
+            DeviceTexture dev;
+        #endif
     #endif 
 
     int textureCount = 2; //total count of textures to be loaded
@@ -63,9 +72,9 @@ private:
     int width=800;
 
     float rotSpeed = 90.0f;
-    float lookX = 0.00f;
-    float lookY = 0.00f;
-    float lookZ = 4.0f;
+    float lookX = -0.5f;
+    float lookY = -0.5f;
+    float lookZ = 5.0f;
     float angle = 60.0f;
 
     std::chrono::steady_clock::time_point start;

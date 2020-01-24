@@ -45,8 +45,6 @@ class DeviceTexture : public Device {
 
     VkBuffer indexBuffer;
     VkDeviceMemory indexBufferMemory;
-  
-
 
     
     void createGraphicsPipeline(); //changed for texture

@@ -1,9 +1,9 @@
-#include "device2D.hpp"
+#include "device3D.hpp"
 
-void Device2D::createGraphicsPipeline() {
+void Device3D::createGraphicsPipeline() {
 
-        auto vertShaderCode = readFile("shaders/vert_o.spv");
-        auto fragShaderCode = readFile("shaders/frag_o.spv");
+        auto vertShaderCode = readFile("shaders/vert_3d.spv");
+        auto fragShaderCode = readFile("shaders/frag_3d.spv");
 
         VkShaderModule vertShaderModule = createShaderModule(vertShaderCode);
         VkShaderModule fragShaderModule = createShaderModule(fragShaderCode);
@@ -119,7 +119,7 @@ void Device2D::createGraphicsPipeline() {
         vkDestroyShaderModule(logicDevice, vertShaderModule, nullptr);
 }
 
-void Device2D::createCommandPool(VkSurfaceKHR surface) {
+void Device3D::createCommandPool(VkSurfaceKHR surface) {
 
         QueueFamilyIndices queueFamilyIndices = findQueueFamilies(physicalDevice,surface);
 
@@ -132,47 +132,7 @@ void Device2D::createCommandPool(VkSurfaceKHR surface) {
         }
 }
 
-void Device2D::createVertexBuffer() {
-        VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
-
-        VkBuffer stagingBuffer;
-        VkDeviceMemory stagingBufferMemory;
-        createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
-
-        void* data;
-        vkMapMemory(logicDevice, stagingBufferMemory, 0, bufferSize, 0, &data);
-            memcpy(data, vertices.data(), (size_t) bufferSize);
-        vkUnmapMemory(logicDevice, stagingBufferMemory);
-
-        createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertexBuffer, vertexBufferMemory);
-
-        copyBuffer(stagingBuffer, vertexBuffer, bufferSize);
-
-        vkDestroyBuffer(logicDevice, stagingBuffer, nullptr);
-        vkFreeMemory(logicDevice, stagingBufferMemory, nullptr);
-}
-
-void Device2D::createIndexBuffer() {
-        VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
-
-        VkBuffer stagingBuffer;
-        VkDeviceMemory stagingBufferMemory;
-        createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
-
-        void* data;
-        vkMapMemory(logicDevice, stagingBufferMemory, 0, bufferSize, 0, &data);
-            memcpy(data, indices.data(), (size_t) bufferSize);
-        vkUnmapMemory(logicDevice, stagingBufferMemory);
-
-        createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, indexBuffer, indexBufferMemory);
-
-        copyBuffer(stagingBuffer, indexBuffer, bufferSize);
-
-        vkDestroyBuffer(logicDevice, stagingBuffer, nullptr);
-        vkFreeMemory(logicDevice, stagingBufferMemory, nullptr);
-}
-
-void Device2D::createCommandBuffers() {
+void Device3D::createCommandBuffers() {
 
         commandBuffers.resize(swapChainFramebuffers.size());
 
@@ -227,7 +187,7 @@ void Device2D::createCommandBuffers() {
         }
 }
 
-void Device2D::createDescriptorPool() {
+void Device3D::createDescriptorPool() {
     VkDescriptorPoolSize poolSize = {};
     poolSize.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
     poolSize.descriptorCount = static_cast<uint32_t>(swapChainImages.size());
@@ -244,7 +204,7 @@ void Device2D::createDescriptorPool() {
 }
 
 
-void Device2D::createDescriptorSetLayout(){
+void Device3D::createDescriptorSetLayout(){
     VkDescriptorSetLayoutBinding uboLayoutBinding = {};
     uboLayoutBinding.binding = 0;
     uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -264,7 +224,7 @@ void Device2D::createDescriptorSetLayout(){
 
 }
 
-void Device2D::createDescriptorSets() {
+void Device3D::createDescriptorSets() {
         std::vector<VkDescriptorSetLayout> layouts(swapChainImages.size(), descriptorSetLayout);
         VkDescriptorSetAllocateInfo allocInfo = {};
         allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
@@ -296,7 +256,7 @@ void Device2D::createDescriptorSets() {
         }
 }
 
-void Device2D::recreateSwapChain(GLFWwindow* window, VkSurfaceKHR surface){
+void Device3D::recreateSwapChain(GLFWwindow* window, VkSurfaceKHR surface){
         int width = 0, height = 0;
         glfwGetFramebufferSize(window, &width, &height);
         while (width == 0 || height == 0) {
@@ -319,7 +279,7 @@ void Device2D::recreateSwapChain(GLFWwindow* window, VkSurfaceKHR surface){
         createCommandBuffers();
 }
 
-void Device2D::createImageViews() {
+void Device3D::createImageViews() {
         swapChainImageViews.resize(swapChainImages.size());
 
         for (size_t i = 0; i < swapChainImages.size(); i++) {
@@ -344,12 +304,52 @@ void Device2D::createImageViews() {
         }
 }
 
-void Device2D::initArrays(){
-    ncReader2D.readAndInit("netcdfreader/o.nc");
-    ncReader2D.generateValues();
-    ncReader2D.generateVertexArray(vertices,indices,true);
+void Device3D::createVertexBuffer() {
+        VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
+
+        VkBuffer stagingBuffer;
+        VkDeviceMemory stagingBufferMemory;
+        createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+
+        void* data;
+        vkMapMemory(logicDevice, stagingBufferMemory, 0, bufferSize, 0, &data);
+            memcpy(data, vertices.data(), (size_t) bufferSize);
+        vkUnmapMemory(logicDevice, stagingBufferMemory);
+
+        createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertexBuffer, vertexBufferMemory);
+
+        copyBuffer(stagingBuffer, vertexBuffer, bufferSize);
+
+        vkDestroyBuffer(logicDevice, stagingBuffer, nullptr);
+        vkFreeMemory(logicDevice, stagingBufferMemory, nullptr);
 }
 
-bool Device2D::updateArrays(){
-    return ncReader2D.updateVertexArray(vertices);
+void Device3D::createIndexBuffer() {
+        VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
+
+        VkBuffer stagingBuffer;
+        VkDeviceMemory stagingBufferMemory;
+        createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+
+        void* data;
+        vkMapMemory(logicDevice, stagingBufferMemory, 0, bufferSize, 0, &data);
+            memcpy(data, indices.data(), (size_t) bufferSize);
+        vkUnmapMemory(logicDevice, stagingBufferMemory);
+
+        createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, indexBuffer, indexBufferMemory);
+
+        copyBuffer(stagingBuffer, indexBuffer, bufferSize);
+
+        vkDestroyBuffer(logicDevice, stagingBuffer, nullptr);
+        vkFreeMemory(logicDevice, stagingBufferMemory, nullptr);
+}
+
+void Device3D::initArrays(){
+    ncReader3D.readAndInit("netcdfreader/o.nc");
+    ncReader3D.generateValues();
+    ncReader3D.generateVertexArray(vertices,indices,true);
+}
+
+bool Device3D::updateArrays(){
+    return ncReader3D.updateVertexArray(vertices);
 }

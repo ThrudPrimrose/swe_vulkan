@@ -79,20 +79,37 @@ void Creator::mainLoop(){
             changeView(move_msg);
         }
         #ifdef TWOD
-        now = std::chrono::steady_clock::now();
-        if (std::chrono::duration_cast<std::chrono::seconds>(now - start).count()>0.5){
-            start = now;
-            drawFrame();
-            bool endreached = dev.updateArrays();
-            if (!endreached){
-                dev.createVertexBuffer();
-                dev.createIndexBuffer();
-                dev.createUniformBuffers();
-                dev.createDescriptorPool();
-                dev.createDescriptorSets();
-                dev.createCommandBuffers();
+            now = std::chrono::steady_clock::now();
+            if (std::chrono::duration_cast<std::chrono::seconds>(now - start).count()>0.5){
+                start = now;
+                drawFrame();
+                bool endreached = dev.updateArrays();
+                if (!endreached){
+                    dev.createVertexBuffer();
+                    dev.createIndexBuffer();
+                    dev.createUniformBuffers();
+                    dev.createDescriptorPool();
+                    dev.createDescriptorSets();
+                    dev.createCommandBuffers();
+                }
             }
-        }
+        #endif
+
+        #ifdef THRID
+            now = std::chrono::steady_clock::now();
+            if (std::chrono::duration_cast<std::chrono::seconds>(now - start).count()>0.5){
+                start = now;
+                drawFrame();
+                bool endreached = dev.updateArrays();
+                if (!endreached){
+                    dev.createVertexBuffer();
+                    dev.createIndexBuffer();
+                    dev.createUniformBuffers();
+                    dev.createDescriptorPool();
+                    dev.createDescriptorSets();
+                    dev.createCommandBuffers();
+                }
+            }
         #endif
         drawFrame();
         //gui.drawObjects(dev);
@@ -168,35 +185,7 @@ void Creator::initVulkan(){
     createInstance();
     setupDebugMessenger();
     gui.createSurface(instance);
-    #ifndef TWOD
-        dev.pickPhysicalDevice(instance,gui.surface);
-        dev.createLogicalDevice(enableValidationLayers, validationLayers,gui.surface);
-        dev.createSwapChain(gui.surface);
-        dev.createImageViews();
-        dev.createRenderPass();
-        dev.createDescriptorSetLayout();
-        dev.createGraphicsPipeline();
-        dev.createFramebuffers();
-        dev.createCommandPool(gui.surface);
-
-        for(dev.tInd=0; dev.tInd<textureCount; dev.tInd++){
-            dev.createTextureImage(textureNames[dev.tInd]);
-            dev.createTextureImageView();
-            dev.createTextureSampler();
-            dev.createVertexBuffer();
-        }
-        dev.createIndexBuffer();
-    
-        dev.createUniformBuffers();
-        dev.createDescriptorPool();
-
-        for(dev.tInd=0; dev.tInd<textureCount; dev.tInd++){
-            dev.createDescriptorSets();
-        }
-        
-        dev.createCommandBuffers();
-        dev.createSyncObjects();
-    #else
+    #ifdef TWOD
     //means top down 2d for now
         dev.pickPhysicalDevice(instance,gui.surface);
         dev.createLogicalDevice(enableValidationLayers, validationLayers,gui.surface);
@@ -215,7 +204,58 @@ void Creator::initVulkan(){
         dev.createDescriptorSets();
         dev.createCommandBuffers();
         dev.createSyncObjects();
-    #endif
+    #else 
+        #if THRID
+        std::cout<<"we in thid"<<std::endl;
+        dev.pickPhysicalDevice(instance,gui.surface);
+        dev.createLogicalDevice(enableValidationLayers, validationLayers,gui.surface);
+        dev.createSwapChain(gui.surface);
+        dev.createImageViews();
+        dev.createRenderPass();
+        dev.createDescriptorSetLayout();
+        dev.createGraphicsPipeline();
+        dev.createFramebuffers();
+        dev.createCommandPool(gui.surface);
+        dev.initArrays();
+        dev.createVertexBuffer();
+        dev.createIndexBuffer();
+        dev.createUniformBuffers();
+        dev.createDescriptorPool();
+        dev.createDescriptorSets();
+        dev.createCommandBuffers();
+        dev.createSyncObjects();
+       
+        #else
+        //texture
+            dev.pickPhysicalDevice(instance,gui.surface);
+            dev.createLogicalDevice(enableValidationLayers, validationLayers,gui.surface);
+            dev.createSwapChain(gui.surface);
+            dev.createImageViews();
+            dev.createRenderPass();
+            dev.createDescriptorSetLayout();
+            dev.createGraphicsPipeline();
+            dev.createFramebuffers();
+            dev.createCommandPool(gui.surface);
+
+            for(dev.tInd=0; dev.tInd<textureCount; dev.tInd++){
+                dev.createTextureImage(textureNames[dev.tInd]);
+                dev.createTextureImageView();
+                dev.createTextureSampler();
+                dev.createVertexBuffer();
+            }
+            dev.createIndexBuffer();
+        
+            dev.createUniformBuffers();
+            dev.createDescriptorPool();
+
+            for(dev.tInd=0; dev.tInd<textureCount; dev.tInd++){
+                dev.createDescriptorSets();
+            }
+            
+            dev.createCommandBuffers();
+            dev.createSyncObjects();
+        #endif
+    #endif 
 }
 
 

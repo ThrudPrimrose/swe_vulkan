@@ -515,3 +515,4 @@ void Device::endSingleTimeCommands(VkCommandBuffer commandBuffer) {
 
     vkFreeCommandBuffers(logicDevice, commandPool, 1, &commandBuffer);
 }
+

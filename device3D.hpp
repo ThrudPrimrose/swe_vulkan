@@ -1,12 +1,12 @@
-#ifndef DEVICE2D
-#define DEVICE2D
+#ifndef DEVICE3D
+#define DEVICE3D
 
 #include "device.hpp"
-#include "netcdfreader/ncReader2D.hpp"
+#include "netcdfreader/ncReader3D.hpp"
 
-class Device2D : public Device {
+class Device3D : public Device {
     private:
-    NcReader2D ncReader2D; //this variant not like in swe has to be initialized
+    NcReader3D ncReader3D; //this variant not like in swe has to be initialized
 
     public:
     //in texture we initialized these per texture
@@ -16,7 +16,7 @@ class Device2D : public Device {
     VkDeviceMemory indexBufferMemory;
     VkBuffer vertexBuffer;
     VkDeviceMemory vertexBufferMemory;
-    std::vector<Vertex> vertices;
+    std::vector<Vertex3D> vertices;
     std::vector<uint16_t> indices;
 
     
@@ -38,4 +38,5 @@ class Device2D : public Device {
 
 };
 
-#endif
+
+#endif 
