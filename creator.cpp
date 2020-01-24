@@ -205,7 +205,7 @@ void Creator::initVulkan(){
         dev.createCommandBuffers();
         dev.createSyncObjects();
     #else 
-        #if THRID
+        #ifdef THRID
         std::cout<<"we in thid"<<std::endl;
         dev.pickPhysicalDevice(instance,gui.surface);
         dev.createLogicalDevice(enableValidationLayers, validationLayers,gui.surface);
@@ -216,7 +216,7 @@ void Creator::initVulkan(){
         dev.createGraphicsPipeline();
         dev.createFramebuffers();
         dev.createCommandPool(gui.surface);
-        dev.initArrays();
+        //dev.initArrays();
         dev.createVertexBuffer();
         dev.createIndexBuffer();
         dev.createUniformBuffers();
@@ -420,7 +420,7 @@ void Creator::updateUniformBuffer(uint32_t currentImage) {
     //glm::rotate(glm::mat4(1.0f), time * glm::radians(0.f), glm::vec3(0.0f, 0.0f, 1.0f));
     ubo.model =  glm::mat4(1.0f);
    
-    ubo.view = glm::lookAt(glm::vec3(lookX, lookY, lookZ), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.0f, 0.0f, 1.0f));
+    ubo.view = glm::lookAt(glm::vec3(lookX, lookY, lookZ), glm::vec3(0.5f, 0.5f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
     ubo.proj = glm::perspective(glm::radians(angle), dev.swapChainExtent.width / (float) dev.swapChainExtent.height, 0.001f, 99999.0f);
     ubo.proj[1][1] *= -1;   
 

@@ -29,7 +29,7 @@ std::vector<uint16_t> &i){
 
     for (int i=0; i<nx; i++){ 
       glm::vec3 color = generateColor(i,yOf);
-      Vertex3D tmp ={{i*dx, sY,0.f}, color, {0.f,0.f}};
+      Vertex3D tmp ={{i*dx, sY,0.f}, color, {1.f,1.f}};
       v.push_back(tmp);
 
     }
