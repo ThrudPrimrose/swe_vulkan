@@ -87,7 +87,7 @@ std::vector<uint32_t> &i, bool setDynamicMaxH){
 bool NcReader2D::updateVertexArray(std::vector<Vertex> &v){
     maxGeneratedTime+=1;
     //std::cout<<"mT: "<<curtimestep<<"curT: "<<maxGeneratedTime<<std::endl;
-    if(maxGeneratedTime>curtimestep){
+    if(maxGeneratedTime>=curtimestep){
       std::cout<<"end of simulation reached"<<std::endl;
       return true;
     }

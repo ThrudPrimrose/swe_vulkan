@@ -165,8 +165,8 @@ float NcReader::abs(float a,float b){
         divide = ny;
       }
 
-      dx = (end-start)/nx;
-      dy = (end-start)/ny;
+      dx = (end-start)/divide;
+      dy = (end-start)/divide;
       maxGeneratedTime=0;
     
       generatedValues=true;
@@ -177,9 +177,15 @@ void NcReader::updateMaxH(){
   if(!init){
     std::cout<<"calling this function before the initialization will cause bugs"<<std::endl;
   }
-  float max = h_vec[0] +b_vec[0];
+  float max;
+  if(b_vec[0]<0){
+    max = h_vec[0] +b_vec[0];
+  }else{
+    max = 0.f;
+  }
+ 
   for(int i=0; i<nx*ny;i++){
-    h_vec[i] +b_vec[i]> max ? max=h_vec[i]+b_vec[i] : max=max ;
+    h_vec[i] +b_vec[i]> max  && b_vec[i]<0 ? max=h_vec[i]+b_vec[i] : max=max ;
   }
   maxHforWhite = max;
   std::cout<<"Dynamic max height is: "<<maxHforWhite<<std::endl;

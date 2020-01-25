@@ -298,11 +298,13 @@ void Device3D::createImageViews() {
             createInfo.subresourceRange.baseArrayLayer = 0;
             createInfo.subresourceRange.layerCount = 1;
 
-            if (vkCreateImageView(logicDevice, &createInfo, nullptr, &swapChainImageViews[i]) != VK_SUCCESS) {
+            if (vkCreateImageView(logicDevice, &createInfo, nullptr,
+             &swapChainImageViews[i]) != VK_SUCCESS) {
                 throw std::runtime_error("failed to create image views!");
             }
         }
 }
+
 
 void Device3D::createVertexBuffer() {
         VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
@@ -345,10 +347,40 @@ void Device3D::createIndexBuffer() {
 }
 
 void Device3D::initArrays(){
-    ncReader3D.readAndInit("netcdfreader/rectangle.nc");
+    ncReader3D.readAndInit("netcdfreader/tohoku.nc");
     ncReader3D.generateVertexArray(vertices,indices,true);
 }
 
 bool Device3D::updateArrays(){
     return ncReader3D.updateVertexArray(vertices);
+}
+
+
+VkFormat Device3D::findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features) {
+    for (VkFormat format : candidates) {
+        VkFormatProperties props;
+        vkGetPhysicalDeviceFormatProperties(physicalDevice, format, &props);
+        if (tiling == VK_IMAGE_TILING_LINEAR && (props.linearTilingFeatures & features) == features) {
+            return format;
+        } else if (tiling == VK_IMAGE_TILING_OPTIMAL && (props.optimalTilingFeatures & features) == features) {
+            return format;
+        }
+    }
+    throw std::runtime_error("failed to find supported format!");
+}
+
+VkFormat Device3D::findDepthFormat() {
+    return findSupportedFormat(
+        {VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT},
+        VK_IMAGE_TILING_OPTIMAL,
+        VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT
+    );
+}
+
+bool Device3D::hasStencilComponent(VkFormat format) {
+    return format == VK_FORMAT_D32_SFLOAT_S8_UINT || format == VK_FORMAT_D24_UNORM_S8_UINT;
+}
+
+void Device3D::createDepthResources(){
+
 }

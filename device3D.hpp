@@ -18,6 +18,11 @@ class Device3D : public Device {
     VkDeviceMemory vertexBufferMemory;
     std::vector<Vertex3D> vertices;
     std::vector<uint32_t> indices;
+    VkFormat depthFormat;
+
+    VkImage depthImage;
+    VkDeviceMemory depthImageMemory;
+    VkImageView depthImageView;
 
     
     void createCommandBuffers();
@@ -35,6 +40,13 @@ class Device3D : public Device {
     void initArrays();
     bool updateArrays();
     void createGraphicsPipeline();
+
+    //For depth buffering
+    VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates, 
+    VkImageTiling tiling, VkFormatFeatureFlags features);
+    VkFormat findDepthFormat();
+    bool hasStencilComponent(VkFormat format);
+    void createDepthResources();
 
 };
 

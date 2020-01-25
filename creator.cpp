@@ -216,6 +216,7 @@ void Creator::initVulkan(){
         dev.createGraphicsPipeline();
         dev.createFramebuffers();
         dev.createCommandPool(gui.surface);
+        //dev.createDepthResources();
         dev.initArrays();
         dev.createVertexBuffer();
         dev.createIndexBuffer();

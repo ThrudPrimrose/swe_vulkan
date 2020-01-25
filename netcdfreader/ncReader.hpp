@@ -26,10 +26,13 @@
 //build a static image of the t=0;
 class NcReader  {
   protected:
-  glm::vec3 limegreen = {0.196, 0.804, 0.196};
+  glm::vec3 limegreen = {0.196, 0.874, 0.196};
   glm::vec3 cyan = {0.08,0.92,0.97};
   glm::vec3 white = {0.97,0.97,0.97};
   glm::vec3 red = {0.97,0.08,0.08};
+  glm::vec3 coral = {0.95,0.498039,0.0};
+  glm::vec3 slateblue =  {0.08,0.4988,0.98};
+  glm::vec3 skyblue = {0.196,0.6,0.8};
     
     int nx; //!< Size of the x-coordinates array
     int ny; //!< Size of the y-coordinates array
