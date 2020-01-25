@@ -102,6 +102,7 @@ void Creator::mainLoop(){
                 drawFrame();
                 bool endreached = dev.updateArrays();
                 if (!endreached){
+                    dev.createMSAAResources();
                     dev.createDepthResources();
                     dev.createVertexBuffer();
                     dev.createIndexBuffer();
@@ -209,12 +210,14 @@ void Creator::initVulkan(){
         #ifdef THRID
         std::cout<<"we in thid"<<std::endl;
         dev.pickPhysicalDevice(instance,gui.surface);
+        dev.setMaxUsableSampleCount();
         dev.createLogicalDevice(enableValidationLayers, validationLayers,gui.surface);
         dev.createSwapChain(gui.surface);
         dev.createImageViews();
         dev.createRenderPass();
         dev.createDescriptorSetLayout();
         dev.createGraphicsPipeline();
+        dev.createMSAAResources();
         dev.createDepthResources();
         dev.createFramebuffers();
         dev.createCommandPool(gui.surface);

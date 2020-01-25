@@ -83,7 +83,7 @@ void Device3D::createGraphicsPipeline() {
         VkPipelineMultisampleStateCreateInfo multisampling = {};
         multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
         multisampling.sampleShadingEnable = VK_FALSE;
-        multisampling.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+        multisampling.rasterizationSamples = msaaSamples;
 
         VkPipelineColorBlendAttachmentState colorBlendAttachment = {};
         colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
@@ -289,6 +289,7 @@ void Device3D::recreateSwapChain(GLFWwindow* window, VkSurfaceKHR surface){
         createImageViews();
         createRenderPass();
         createGraphicsPipeline();
+        createMSAAResources();
         createDepthResources();
         createFramebuffers();
         createUniformBuffers();
@@ -406,6 +407,7 @@ void Device3D::createDepthResources(){
     VkFormat depthFormat = findDepthFormat();
     
     imageCreator.createImage(swapChainExtent.width, swapChainExtent.height, 
+    msaaSamples,
     depthFormat, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, 
     VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, depthImage, depthImageMemory,
     logicDevice,physicalDevice);
@@ -439,18 +441,29 @@ VkImageAspectFlags aspectMask) {
 void Device3D::createRenderPass() {
         VkAttachmentDescription colorAttachment = {};
         colorAttachment.format = swapChainImageFormat;
-        colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+        colorAttachment.samples = msaaSamples;
         colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
         colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
         colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
         colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
         colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
         //if this is the final-> change back to 
-        colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+        //was VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+        colorAttachment.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;;
+
+        VkAttachmentDescription colorAttachmentResolve = {};
+        colorAttachmentResolve.format = swapChainImageFormat;
+        colorAttachmentResolve.samples = VK_SAMPLE_COUNT_1_BIT;
+        colorAttachmentResolve.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+        colorAttachmentResolve.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+        colorAttachmentResolve.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+        colorAttachmentResolve.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+        colorAttachmentResolve.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        colorAttachmentResolve.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
 
         VkAttachmentDescription depthAttachment = {};
         depthAttachment.format = findDepthFormat();
-        depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+        depthAttachment.samples = msaaSamples;
         depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
         depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
         depthAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
@@ -462,6 +475,10 @@ void Device3D::createRenderPass() {
         colorAttachmentRef.attachment = 0;
         colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
+         VkAttachmentReference colorAttachmentResolveRef = {};
+        colorAttachmentResolveRef.attachment = 2;
+        colorAttachmentResolveRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
         VkAttachmentReference depthAttachmentRef = {};
         depthAttachmentRef.attachment = 1;
         depthAttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
@@ -470,6 +487,7 @@ void Device3D::createRenderPass() {
         subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
         subpass.colorAttachmentCount = 1;
         subpass.pColorAttachments = &colorAttachmentRef;
+        subpass.pResolveAttachments = &colorAttachmentResolveRef;
         subpass.pDepthStencilAttachment = &depthAttachmentRef;
 
         VkSubpassDependency dependency = {};
@@ -480,7 +498,7 @@ void Device3D::createRenderPass() {
         dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
         dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
 
-        std::array<VkAttachmentDescription, 2> attachments = {colorAttachment, depthAttachment};
+        std::array<VkAttachmentDescription, 3> attachments = {colorAttachment, depthAttachment, colorAttachmentResolve};
         VkRenderPassCreateInfo renderPassInfo = {};
         renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
         renderPassInfo.attachmentCount = static_cast<uint32_t>(attachments.size());;
@@ -499,9 +517,10 @@ void Device3D::createFramebuffers() {
         swapChainFramebuffers.resize(swapChainImageViews.size());
 
         for (size_t i = 0; i < swapChainImageViews.size(); i++) {
-            std::array<VkImageView, 2> attachments = {
-                swapChainImageViews[i],
-                depthImageView
+            std::array<VkImageView, 3> attachments = {
+                colorImageView,
+                depthImageView,
+                swapChainImageViews[i]
             };
 
             VkFramebufferCreateInfo framebufferInfo = {};
@@ -520,6 +539,10 @@ void Device3D::createFramebuffers() {
 }
 
 void Device3D::cleanupSwapChain() {
+        vkDestroyImageView(logicDevice, colorImageView, nullptr);
+        vkDestroyImage(logicDevice, colorImage, nullptr);
+        vkFreeMemory(logicDevice, colorImageMemory, nullptr);
+
         vkDestroyImageView(logicDevice, depthImageView, nullptr);
         vkDestroyImage(logicDevice, depthImage, nullptr);
         vkFreeMemory(logicDevice, depthImageMemory, nullptr);
@@ -543,4 +566,35 @@ void Device3D::cleanupSwapChain() {
             vkFreeMemory(logicDevice, uniformBuffersMemory[i], nullptr);
         }
     vkDestroyDescriptorPool(logicDevice, descriptorPool, nullptr);
+}
+
+VkSampleCountFlagBits Device3D::getMaxUsableSampleCount() {
+    VkPhysicalDeviceProperties physicalDeviceProperties;
+    vkGetPhysicalDeviceProperties(physicalDevice, &physicalDeviceProperties);
+
+    VkSampleCountFlags counts = physicalDeviceProperties.limits.framebufferColorSampleCounts & physicalDeviceProperties.limits.framebufferDepthSampleCounts;
+    if (counts & VK_SAMPLE_COUNT_16_BIT) { return VK_SAMPLE_COUNT_16_BIT; }
+    if (counts & VK_SAMPLE_COUNT_8_BIT) { return VK_SAMPLE_COUNT_8_BIT; }
+    if (counts & VK_SAMPLE_COUNT_4_BIT) { return VK_SAMPLE_COUNT_4_BIT; }
+    if (counts & VK_SAMPLE_COUNT_2_BIT) { return VK_SAMPLE_COUNT_2_BIT; }
+
+    return VK_SAMPLE_COUNT_1_BIT;
+}
+
+void Device3D::setMaxUsableSampleCount(){
+    msaaSamples=getMaxUsableSampleCount();
+    std::cout<<"Max Usable Sample Count: "<<msaaSamples<<std::endl;
+
+}
+
+void Device3D::createMSAAResources() {
+    VkFormat colorFormat = swapChainImageFormat;
+
+    imageCreator.createImage(swapChainExtent.width, swapChainExtent.height,
+    msaaSamples, colorFormat, VK_IMAGE_TILING_OPTIMAL, 
+    VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT |
+    VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, 
+    VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, colorImage, colorImageMemory,
+    logicDevice,physicalDevice);
+    colorImageView = createImageView(colorImage, colorFormat, VK_IMAGE_ASPECT_COLOR_BIT);
 }
