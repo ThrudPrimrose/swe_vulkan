@@ -216,7 +216,7 @@ void Creator::initVulkan(){
         dev.createGraphicsPipeline();
         dev.createFramebuffers();
         dev.createCommandPool(gui.surface);
-        //dev.initArrays();
+        dev.initArrays();
         dev.createVertexBuffer();
         dev.createIndexBuffer();
         dev.createUniformBuffers();
@@ -417,13 +417,16 @@ void Creator::updateUniformBuffer(uint32_t currentImage) {
     float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
     UniformBufferObject ubo = {};
-    //glm::rotate(glm::mat4(1.0f), time * glm::radians(0.f), glm::vec3(0.0f, 0.0f, 1.0f));
-    ubo.model =  glm::mat4(1.0f);
-   
-    ubo.view = glm::lookAt(glm::vec3(lookX, lookY, lookZ), glm::vec3(0.5f, 0.5f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-    ubo.proj = glm::perspective(glm::radians(angle), dev.swapChainExtent.width / (float) dev.swapChainExtent.height, 0.001f, 99999.0f);
+    glm::mat4 rotate1 = glm::rotate(glm::mat4(1.0f), 20.5f *glm::radians(lookY), glm::vec3(0.0f, 0.0f, 1.0f));
+    glm::mat4 rotate2 = glm::rotate(glm::mat4(1.0f), 20.5f *glm::radians(lookX), glm::vec3(1.0f, 0.0f, 0.0f));
+    ubo.model = rotate1 * rotate2;
+    //glm::rotate(glm::mat4(1.0f), time * glm::radians(90.f), glm::vec3(0.0f, 0.0f, 1.0f));
+    ubo.view = glm::lookAt(glm::vec3(4.0f, 4.0f, lookZ), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    //ubo.view = glm::lookAt(glm::vec3(lookX, lookX,s lookZ), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    //ubo.view = glm::lookAt(glm::vec3(lookX, lookY, lookZ), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    
+    ubo.proj = glm::perspective(glm::radians(angle), dev.swapChainExtent.width / (float) dev.swapChainExtent.height, 0.000001f, 99999.0f);
     ubo.proj[1][1] *= -1;   
-
     void* data;
     vkMapMemory(dev.logicDevice, dev.uniformBuffersMemory[currentImage], 0, sizeof(ubo), 0, &data);
         memcpy(data, &ubo, sizeof(ubo));

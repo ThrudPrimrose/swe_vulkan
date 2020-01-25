@@ -213,7 +213,7 @@ void Device2D::createCommandBuffers() {
                 VkDeviceSize offsets[] = {0};
                 vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffers, offsets);
 
-                vkCmdBindIndexBuffer(commandBuffers[i], indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+                vkCmdBindIndexBuffer(commandBuffers[i], indexBuffer, 0, VK_INDEX_TYPE_UINT32);
 
                 vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[i], 0, nullptr);
 
@@ -345,8 +345,7 @@ void Device2D::createImageViews() {
 }
 
 void Device2D::initArrays(){
-    ncReader2D.readAndInit("netcdfreader/o.nc");
-    ncReader2D.generateValues();
+    ncReader2D.readAndInit("netcdfreader/rectangle.nc");
     ncReader2D.generateVertexArray(vertices,indices,true);
 }
 

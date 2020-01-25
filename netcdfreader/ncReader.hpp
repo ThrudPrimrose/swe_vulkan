@@ -34,6 +34,21 @@ class NcReader  {
     int nx; //!< Size of the x-coordinates array
     int ny; //!< Size of the y-coordinates array
 
+    
+    float start = -1.f; //best to begin from -1
+    float end = 1.f; //limit of the array , best to normalize to 1
+    
+    //this are for print 
+    //have nothing to do with dx and dy from swe netcdfreader
+    float dx = 0.1f; //distance between two cells in x
+    float dy = 0.1f; //distance between two cells in y
+
+    float maxHforWhite = 30.0;
+    
+    float sY = start; //begin loc for sY
+
+    
+    
     std::vector<float> h_vec; //!< Dynamic array for waterheights, maps 2D h array to 1D
     std::vector<float> b_vec; //!< Dynamic array for bathymetry values, maps 2D h array to 1D
     std::vector<float> times_vec; //!< Dynamic array for simulation times for timesteps
@@ -54,7 +69,7 @@ class NcReader  {
     
   public:
   std::vector<Vertex> vertexArray;
-  std::vector<uint16_t> indexArray;
+  std::vector<uint32_t> indexArray;
 
   std::string afterquake ; //!< Stores the name of the bathymetry file
   std::string beforequake ; //!< Stores the name of the displacement file
@@ -72,6 +87,9 @@ class NcReader  {
   float max(float a,float b);
   float min(float a,float b);
   float abs(float a,float b);
+
+  void generateValues();
+  void updateMaxH();
 
 };
 

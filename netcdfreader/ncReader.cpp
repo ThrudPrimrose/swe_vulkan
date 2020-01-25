@@ -81,6 +81,7 @@
         /*for(int i=0;i<nx*ny;i++){
             std::cout<<h_vec[i]<<std::endl;
         }*/
+        generateValues();
     }
 
     
@@ -151,3 +152,35 @@ float NcReader::abs(float a,float b){
   return ret;
 }
 
+
+//should be called only afger readAndInit function
+    void NcReader::generateValues(){
+      if(!init){
+        std::cout<<"if the initialization is not done, generate values will most probably wont worj and this may indicate a bug"<<std::endl;
+      }
+      int divide;
+      if (nx<ny){
+        divide = nx;
+      }else if (ny<nx){
+        divide = ny;
+      }
+
+      dx = (end-start)/nx;
+      dy = (end-start)/ny;
+      maxGeneratedTime=0;
+    
+      generatedValues=true;
+      
+}
+
+void NcReader::updateMaxH(){
+  if(!init){
+    std::cout<<"calling this function before the initialization will cause bugs"<<std::endl;
+  }
+  float max = h_vec[0] +b_vec[0];
+  for(int i=0; i<nx*ny;i++){
+    h_vec[i] +b_vec[i]> max ? max=h_vec[i]+b_vec[i] : max=max ;
+  }
+  maxHforWhite = max;
+  std::cout<<"Dynamic max height is: "<<maxHforWhite<<std::endl;
+}

@@ -1,21 +1,13 @@
 #include "ncReader2D.hpp"
 
-//should be called only afger readAndInit function
-    void NcReader2D::generateValues(){
-      if(!init){
-        std::cout<<"if the initialization is not done, generate values will most probably wont worj and this may indicate a bug"<<std::endl;
-      }
-      dx = (end-start)/nx;
-      dy = (end-start)/ny;
-      generatedValues=true;
-    }
+
 
     //generate from squares -> the vertices
     //and corresponding vertices
     //the color changes with the color
     //
     void NcReader2D::generateFirstVertexLine(std::vector<Vertex> &v, 
-std::vector<uint16_t> &i){
+std::vector<uint32_t> &i){
     if(generatedValues!=true){
       std::cout<<"Having dx and dy as null will create an infiinte loop and kill the program"<<std::endl;
     }
@@ -29,13 +21,15 @@ std::vector<uint16_t> &i){
 
     for (int i=0; i<nx; i++){ 
       glm::vec3 color = generateColor(i,yOf);
-      Vertex tmp ={{i*dx, sY}, color};
+      Vertex tmp ={{i*dx+start, sY}, color};
       v.push_back(tmp);
 
     }
+    sY+=dy;
+    yOf+=1;
     for (int j=0; j<nx; j++){
       glm::vec3 color = generateColor(j,yOf);
-      Vertex tmp ={{j*dx, sY+dy}, color};
+      Vertex tmp ={{j*dx+start, sY}, color};
       v.push_back(tmp);
     }
     //curmaxUsedInt ==9
@@ -43,20 +37,18 @@ std::vector<uint16_t> &i){
       std::vector x = {j, j+1, nx+j+1, nx+j+1, nx+j, j};
       i.insert(i.end(),x.begin(),x.end());
     }
-    sX=0.f;
+
     sY+=dy;
     yOf+=1;
     maxUsedInt=2*nx-1;
 }
 
 void NcReader2D::generateSecondaryVertexLine(std::vector<Vertex> &v, 
-std::vector<uint16_t> &i){
+std::vector<uint32_t> &i){
   //maxUsedInt - nX willbe the corresponding vertexIndex
-  yOf+=1;
-  sY+=dy;
     for (int i=0; i<nx; i++){ 
       glm::vec3 color = generateColor(i,yOf);
-      Vertex tmp ={{i*dx, sY}, color};
+      Vertex tmp ={{i*dx+start, sY}, color};
       v.push_back(tmp);
     }
     for (int j=0; j<nx-1;j++){
@@ -69,45 +61,56 @@ std::vector<uint16_t> &i){
       i.insert(i.end(),x.begin(),x.end());
     }
     maxUsedInt+=1;
-    sX=0; 
+    yOf+=1;
+    sY+=dy;
+
 }
 
 
 
 void NcReader2D::generateVertexArray(std::vector<Vertex> &v, 
-std::vector<uint16_t> &i, bool setDynamicMaxH){
+std::vector<uint32_t> &i, bool setDynamicMaxH){
   if (setDynamicMaxH){
     updateMaxH();
   }
   generateFirstVertexLine(v,i);
-  while(yOf<ny-1){
+  while(yOf<ny){
     //generate secondary line changes value of yOf
     generateSecondaryVertexLine(v,i);
   }
+  sY=start;
+  yOf = 0;
+  maxUsedInt=0;
   
 }
 
 bool NcReader2D::updateVertexArray(std::vector<Vertex> &v){
     maxGeneratedTime+=1;
-    if(maxGeneratedTime>curtime){
+    //std::cout<<"mT: "<<curtimestep<<"curT: "<<maxGeneratedTime<<std::endl;
+    if(maxGeneratedTime>curtimestep){
       std::cout<<"end of simulation reached"<<std::endl;
       return true;
     }
-    resetValues();
+  
     //reset values before updating
-    while(yOf<ny-1){
+    yOf=0;
+    sY=start;
+    maxUsedInt=0;
+    while(yOf<ny){
       //update secondary line changes value of yOf
       updateVertexLine(v);
     }
-    resetValues();
+    sY = start;
+    yOf = 0;
+    maxUsedInt=0;
+    
     return false;
 }
 
 void NcReader2D::updateVertexLine(std::vector<Vertex> &v){ 
-  for (int i=0; i<nx-1; i++){
+  for (int i=0; i<nx; i++){
     //check to save time
-    if (getWaterHeight(i,yOf,maxGeneratedTime)!=
-    getWaterHeight(i,yOf,maxGeneratedTime-1)){
+   
       //water height has changed
       
       //get the 4 indices
@@ -115,16 +118,7 @@ void NcReader2D::updateVertexLine(std::vector<Vertex> &v){
       //index of i,yof == nx*yOf + i
       glm::vec3 novaColor = generateColor(i,yOf); 
       v[nx*yOf + i].color = novaColor;
-      //i+1,yof
-      novaColor = generateColor(i+1,yOf);
-      v[nx*yOf +i +1 ].color = novaColor;
-      //i,yof+1
-      novaColor = generateColor(i,yOf+1);
-      v[nx*(yOf+1) +i].color = novaColor;
-      //i+1,yof+1
-      novaColor = generateColor(i+1,yOf+1);
-      v[nx*(yOf+1) +i +1 ].color = novaColor;
-    }
+    
   }
   yOf += 1;
 }
@@ -149,24 +143,4 @@ glm::vec3 NcReader2D::generateColor(int xOf,int yOf){
     return white;
 }
 
-void NcReader2D::resetValues(){
-    yOf=0;
-    sX=0.f;
-    sY=0.f;
-    maxUsedInt=0;
-    //Dx dy should remain same;
-}
 
-
-
-void NcReader2D::updateMaxH(){
-  if(!init){
-    std::cout<<"calling this function before the initialization will cause bugs"<<std::endl;
-  }
-  float max = h_vec[0] +b_vec[0];
-  for(int i=0; i<nx*ny;i++){
-    h_vec[i] +b_vec[i]> max ? max=h_vec[i]+b_vec[i] : max=max ;
-  }
-  maxHforWhite = max;
-  std::cout<<"Dynamic max height is: "<<maxHforWhite<<std::endl;
-}

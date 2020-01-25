@@ -25,8 +25,8 @@ void Device3D::createGraphicsPipeline() {
         VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};
         vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 
-        auto bindingDescription = Vertex::getBindingDescription();
-        auto attributeDescriptions = Vertex::getAttributeDescriptions();
+        auto bindingDescription = Vertex3D::getBindingDescription();
+        auto attributeDescriptions = Vertex3D::getAttributeDescriptions();
 
         vertexInputInfo.vertexBindingDescriptionCount = 1;
         vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
@@ -173,7 +173,7 @@ void Device3D::createCommandBuffers() {
                 VkDeviceSize offsets[] = {0};
                 vkCmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffers, offsets);
 
-                vkCmdBindIndexBuffer(commandBuffers[i], indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+                vkCmdBindIndexBuffer(commandBuffers[i], indexBuffer, 0, VK_INDEX_TYPE_UINT32);
 
                 vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[i], 0, nullptr);
 
@@ -345,8 +345,7 @@ void Device3D::createIndexBuffer() {
 }
 
 void Device3D::initArrays(){
-    ncReader3D.readAndInit("netcdfreader/o.nc");
-    ncReader3D.generateValues();
+    ncReader3D.readAndInit("netcdfreader/rectangle.nc");
     ncReader3D.generateVertexArray(vertices,indices,true);
 }
 

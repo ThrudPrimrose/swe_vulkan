@@ -16,8 +16,8 @@ class Device3D : public Device {
     VkDeviceMemory indexBufferMemory;
     VkBuffer vertexBuffer;
     VkDeviceMemory vertexBufferMemory;
-    std::vector<Vertex3D> vertices = two_squares_vertices;
-    std::vector<uint16_t> indices = two_squares_indices;
+    std::vector<Vertex3D> vertices;
+    std::vector<uint32_t> indices;
 
     
     void createCommandBuffers();
