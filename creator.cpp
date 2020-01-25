@@ -102,6 +102,7 @@ void Creator::mainLoop(){
                 drawFrame();
                 bool endreached = dev.updateArrays();
                 if (!endreached){
+                    dev.createDepthResources();
                     dev.createVertexBuffer();
                     dev.createIndexBuffer();
                     dev.createUniformBuffers();
@@ -214,9 +215,9 @@ void Creator::initVulkan(){
         dev.createRenderPass();
         dev.createDescriptorSetLayout();
         dev.createGraphicsPipeline();
+        dev.createDepthResources();
         dev.createFramebuffers();
         dev.createCommandPool(gui.surface);
-        //dev.createDepthResources();
         dev.initArrays();
         dev.createVertexBuffer();
         dev.createIndexBuffer();

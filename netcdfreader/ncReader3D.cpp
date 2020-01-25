@@ -198,7 +198,7 @@ glm::vec3 NcReader3D::generateColor(int xOf,int yOf){
         if (hb > 0) {
             float factor = std::min(std::max(( (float)pow(1.f - hb/scaleWet, 2.f) ),0.f),1.f);
             glm::vec3 col1 = slateblue; //{236.f/256, 230.f/256, 213.f/256};  //light grey #ece6d5
-            glm::vec3 col2 = cyan; //{140.f/256, 3.f/256, 28.f/256};     //dark red   #8c031c
+            glm::vec3 col2 = white; //{140.f/256, 3.f/256, 28.f/256};     //dark red   #8c031c
             
             color[0] = factor * col1[0] + (1.f-factor) * col2[0];
             color[1] = factor * col1[1] + (1.f-factor) * col2[1];
@@ -268,9 +268,12 @@ void NcReader3D::updateMaxHandB(){
   maxHforWhite = maxH;
   maxBforGreen = maxB;
   minBforP = minB;
+  bathOffset = (maxCor * -minB) / maxB;
+  bathOffset*=-1;
   //std::cout<<"Dynamic max height is: "<<maxHforWhite<<std::endl;
   //std::cout<<"Dynamic max bathymetry is: "<<maxBforGreen<<std::endl;
   //std::cout<<"Dynamic min bathymetry is: "<<minBforP<<std::endl;
+  std::cout<<"Bath offset:"<<bathOffset<<std::endl;
 }
 
 

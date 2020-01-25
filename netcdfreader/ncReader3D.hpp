@@ -12,7 +12,7 @@ class NcReader3D : public NcReader {
     float maxCor = 1.f;
     float maxBforGreen = 0.f;
     float minBforP = -1.0f;
-    float bathOffset = -1.f;
+    float bathOffset = -2.f;
 
     glm::vec3 purpuru = {0.62352,0.372549,0.623529};
    
