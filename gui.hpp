@@ -7,10 +7,6 @@
 #include <iostream>
 #include <utility> 
 
-#include <imgui.h>
-#include <examples/imgui_impl_vulkan.h>
-#include <examples/imgui_impl_glfw.h>
-
 #ifdef TWOD
 #include "device2D.hpp"
 #else
