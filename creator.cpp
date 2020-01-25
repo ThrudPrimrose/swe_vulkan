@@ -350,7 +350,6 @@ void Creator::drawFrame() {
         if (result == VK_ERROR_OUT_OF_DATE_KHR) {
             gui.framebufferResized=false; 
             dev.recreateSwapChain(gui.window,gui.surface);
-            gui.rebuild(dev,instance);
             std::cout<<"changing framebuffer"<<std::endl;
             return;
         } else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
