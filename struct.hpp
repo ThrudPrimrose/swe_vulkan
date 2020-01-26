@@ -21,6 +21,14 @@ struct Vertex3D {
     static std::array<VkVertexInputAttributeDescription, 3> getAttributeDescriptions();
 };
 
+struct Vertex3DwB {
+    glm::vec3 pos;
+    glm::vec4 color;
+    glm::vec2 texCoord;
+    static  VkVertexInputBindingDescription getBindingDescription(); 
+    static std::array<VkVertexInputAttributeDescription, 3> getAttributeDescriptions();
+};
+
 struct VertexTexture {
     glm::vec2 pos;
     glm::vec3 color;
