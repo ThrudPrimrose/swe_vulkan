@@ -18,7 +18,7 @@ class Device3D : public Device {
     VkDeviceMemory indexBufferMemory;
     VkBuffer vertexBuffer;
     VkDeviceMemory vertexBufferMemory;
-    std::vector<Vertex3D> vertices;
+    std::vector<Vertex3DwB> vertices;
     std::vector<uint32_t> indices;
     
     //for depth buffer

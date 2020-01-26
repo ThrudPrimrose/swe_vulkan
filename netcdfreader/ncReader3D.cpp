@@ -5,7 +5,7 @@
     //and corresponding vertices
     //the color changes with the color
     //
-    void NcReader3D::generateFirstVertexLine(std::vector<Vertex3D> &v, 
+    void NcReader3D::generateFirstVertexLine(std::vector<Vertex3DwB> &v, 
 std::vector<uint32_t> &i){
     if(generatedValues!=true){
       std::cout<<"Having dx and dy as null will create an infiinte loop and kill the program"<<std::endl;
@@ -17,65 +17,83 @@ std::vector<uint32_t> &i){
       std::cout<<"nothing to draw anymore"<<std::endl;
       return;
     }
+    maxUsedInt+=1;
 
     for (int i=0; i<nx; i++){ 
-      glm::vec3 color = generateColor(i,yOf);
+      glm::vec4 color = generateColor(i,yOf);
       float z = generateCoordinate(i,yOf);
-      Vertex3D tmp ={{i*dx+start, sY,z}, color, {1.f,1.f}};
+      Vertex3DwB tmp ={{i*dx+start, sY,z}, color, {1.f,1.f}};
       v.push_back(tmp);
 
     }
     yOf+=1;
     sY+=dy;
     for (int j=0; j<nx; j++){
-      glm::vec3 color = generateColor(j,yOf);
+      glm::vec4 color = generateColor(j,yOf);
       float z = generateCoordinate(j,yOf);
-      Vertex3D tmp ={{j*dx+start, sY, z}, color, {1.f,1.f}};
+      Vertex3DwB tmp ={{j*dx+start, sY, z}, color, {1.f,1.f}};
       v.push_back(tmp);
     }
     //curmaxUsedInt ==9
     for (int j=0; j<nx-1; j++){
-      std::vector x = {j, j+1, nx+j+1, nx+j+1, nx+j, j};
+      std::vector x = {maxUsedInt+j, maxUsedInt+j+1, 
+      maxUsedInt+nx+j+1, maxUsedInt+nx+j+1, 
+      maxUsedInt+nx+j, maxUsedInt+j};
       i.insert(i.end(),x.begin(),x.end());
     }
 
     sY+=dy;
     yOf+=1;
-    maxUsedInt=2*nx-1;
+    maxUsedInt+=2*nx-1;
 }
 
 
-void NcReader3D::generateSecondaryVertexLine(std::vector<Vertex3D> &v, 
+void NcReader3D::generateSecondaryVertexLine(std::vector<Vertex3DwB> &v, 
 std::vector<uint32_t> &i){
   //maxUsedInt - nX willbe the corresponding vertexIndex
-
+    maxUsedInt+=1;
     for (int i=0; i<nx; i++){ 
-      glm::vec3 color = generateColor(i,yOf);
+      glm::vec4 color = generateColor(i,yOf);
       float z = generateCoordinate(i,yOf);
-      Vertex3D tmp ={{i*dx+start, sY, z}, color, {1.f,1.f}};
+      Vertex3DwB tmp ={{i*dx+start, sY, z}, color, {1.f,1.f}};
       v.push_back(tmp);
     }
     for (int j=0; j<nx-1;j++){
       //(5,6,11,11,10,5)
       //nx=5, maxUsedInt before pattern = 9
-      maxUsedInt+=1;
-      std::vector x = {maxUsedInt-nx,
-      maxUsedInt-nx+1, maxUsedInt+1,maxUsedInt+1, 
-      maxUsedInt,maxUsedInt-nx};
+      std::vector x = {maxUsedInt-nx+j,
+      maxUsedInt-nx+1+j, maxUsedInt+1+j,maxUsedInt+1+j, 
+      maxUsedInt+j,maxUsedInt-nx+j};
       i.insert(i.end(),x.begin(),x.end());
     }
-    maxUsedInt+=1; 
+    maxUsedInt+=nx-1; 
     yOf+=1;
     sY+=dy;
 }
 
 
 
-void NcReader3D::generateVertexArray(std::vector<Vertex3D> &v, 
+void NcReader3D::generateVertexArray(std::vector<Vertex3DwB> &v, 
 std::vector<uint32_t> &i, bool setDynamicMaxH){
   if (setDynamicMaxH){
     updateMaxHandB();
   }
+  //its important to draw bathymetry first
+  //because otherwise blending will be to black
+  maxUsedInt=0;
+  sY=start;
+  yOf=0;
+  generateFirstBathyLine(v,i);
+  while(yOf<ny){
+    generateSecondaryBathyLine(v,i);
+  }
+
+  sY=start;
+  yOf=0;
+  bCount=maxUsedInt+1;
+  std::cout<<"bcount:"<<bCount<<std::endl;
+  //maxUsedInt+=1;
+
   generateFirstVertexLine(v,i);
   while(yOf<ny){
     //generate secondary line changes value of yOf
@@ -83,25 +101,18 @@ std::vector<uint32_t> &i, bool setDynamicMaxH){
   }
   sY = start;
   yOf =0;
-  maxUsedInt+=1;
-
-  generateFirstBathyLine(v,i);
-  while(yOf<ny){
-    generateSecondaryBathyLine(v,i);
-  }
-  sY = start;
-  yOf =0;
-  maxUsedInt=0;
   
   
 }
 
-bool NcReader3D::updateVertexArray(std::vector<Vertex3D> &v){
+bool NcReader3D::updateVertexArray(std::vector<Vertex3DwB> &v){
     maxGeneratedTime+=1;
     if(maxGeneratedTime>=curtimestep){
       std::cout<<"end of simulation reached"<<std::endl;
       return true;
     }
+    yOf=0;
+    sY=start;
    
     //reset values before updating
     while(yOf<ny){
@@ -110,12 +121,11 @@ bool NcReader3D::updateVertexArray(std::vector<Vertex3D> &v){
     }
     sY = start;
     yOf =0;
-    maxUsedInt=0;
   
     return false;
 }
 
-void NcReader3D::updateVertexLine(std::vector<Vertex3D> &v){ 
+void NcReader3D::updateVertexLine(std::vector<Vertex3DwB> &v){ 
   for (int i=0; i<nx; i++){
     //check to save time
       //water height has changed
@@ -123,10 +133,10 @@ void NcReader3D::updateVertexLine(std::vector<Vertex3D> &v){
       //get the 4 indices
       //i,yof
       //index of i,yof == nx*yOf + i
-      glm::vec3 novaColor = generateColor(i,yOf);
+      glm::vec4 novaColor = generateColor(i,yOf);
       float z = generateCoordinate(i,yOf); 
-      v[nx*yOf + i].color = novaColor;
-      v[nx*yOf + i].pos[2] = z;
+      v[bCount +1+ nx*yOf + i].color = novaColor;
+      v[bCount +1+ nx*yOf + i].pos[2] = z;
   }
   yOf += 1;
 }
@@ -172,7 +182,7 @@ void NcReader3D::updateVertexLine(std::vector<Vertex3D> &v){
 
 
 
-glm::vec3 NcReader3D::generateColor(int xOf,int yOf){
+glm::vec4 NcReader3D::generateColor(int xOf,int yOf){
 
     float h= h_vec[maxGeneratedTime*ny*nx + yOf*nx + xOf];
     float b= b_vec[yOf*nx + xOf];
@@ -182,7 +192,7 @@ glm::vec3 NcReader3D::generateColor(int xOf,int yOf){
     float scaleWet = maxHforWhite;//20.f;  //more than this limit stays same color
     float scaleDry = maxBforGreen;//3000.f;
     
-    glm::vec3 color = {1.f, 0.f, 1.f};  //default pink
+    glm::vec4 color = {1.f, 0.f, 1.f,1.f};  //default pink
     
     if(!isWet){
         //function starts steep, but doesn"t change much for values near limit
@@ -213,6 +223,12 @@ glm::vec3 NcReader3D::generateColor(int xOf,int yOf){
             color[1] = factor * col1[1] + (1.f-factor) * col2[1];
             color[2] = factor * col1[2] + (1.f-factor) * col2[2];
         }
+    }
+
+    if(!isWet){
+      color[3] =1.f; //no blend
+    }else{
+      color[3] =.42f; //is half reasonable?
     }
     return color;
 }
@@ -277,7 +293,7 @@ void NcReader3D::updateMaxHandB(){
 }
 
 
-void NcReader3D::generateFirstBathyLine(std::vector<Vertex3D> &v, 
+void NcReader3D::generateFirstBathyLine(std::vector<Vertex3DwB> &v, 
 std::vector<uint32_t> &i){
     if(generatedValues!=true){
       std::cout<<"Having dx and dy as null will create an infiinte loop and kill the program"<<std::endl;
@@ -289,11 +305,15 @@ std::vector<uint32_t> &i){
       std::cout<<"nothing to draw anymore"<<std::endl;
       return;
     }
+    sY=start;
+    yOf=0;
+    maxUsedInt=0;
 
     for (int i=0; i<nx; i++){ 
       glm::vec3 color = generateBathColor(i,yOf);
       float z = generateBathCoordinate(i,yOf);
-      Vertex3D tmp ={{i*dx+start, sY,z+bathOffset}, color, {1.f,1.f}};
+       glm::vec4 realcolor = {color,1.f};
+      Vertex3DwB tmp ={{i*dx+start, sY,z+bathOffset}, realcolor, {1.f,1.f}};
       v.push_back(tmp);
 
     }
@@ -302,7 +322,8 @@ std::vector<uint32_t> &i){
     for (int j=0; j<nx; j++){
       float z = generateBathCoordinate(j,yOf);
       glm::vec3 color = generateBathColor(j,yOf);
-      Vertex3D tmp ={{j*dx+start, sY, z+bathOffset}, color, {1.f,1.f}};
+      glm::vec4 realcolor = {color,1.f};
+      Vertex3DwB tmp ={{j*dx+start, sY, z+bathOffset},realcolor, {1.f,1.f}};
       v.push_back(tmp);
     }
     //curmaxUsedInt ==9
@@ -319,26 +340,28 @@ std::vector<uint32_t> &i){
 }
 
 
-void NcReader3D::generateSecondaryBathyLine(std::vector<Vertex3D> &v, 
+void NcReader3D::generateSecondaryBathyLine(std::vector<Vertex3DwB> &v, 
 std::vector<uint32_t> &i){
+    maxUsedInt+=1;
     for (int i=0; i<nx; i++){ 
       float z = generateBathCoordinate(i,yOf);
       glm::vec3 color = generateBathColor(i,yOf);
-      Vertex3D tmp ={{i*dx+start, sY, z+bathOffset}, color, {1.f,1.f}};
+      glm::vec4 realcolor = {color,1.f};
+      Vertex3DwB tmp ={{i*dx+start, sY, z+bathOffset}, realcolor, {1.f,1.f}};
       v.push_back(tmp);
     }
     for (int j=0; j<nx-1;j++){
       //(5,6,11,11,10,5)
       //nx=5, maxUsedInt before pattern = 9
-      maxUsedInt+=1;
-      std::vector x = {maxUsedInt-nx,
-      maxUsedInt-nx+1, maxUsedInt+1,maxUsedInt+1, 
-      maxUsedInt,maxUsedInt-nx};
+    
+      std::vector x = {maxUsedInt-nx+j,
+      maxUsedInt-nx+1+j, maxUsedInt+1+j,maxUsedInt+1+j, 
+      maxUsedInt+j,maxUsedInt-nx+j};
       i.insert(i.end(),x.begin(),x.end());
     }
-    maxUsedInt+=1; 
     yOf+=1;
     sY+=dy;
+    maxUsedInt+=nx-1;
 }
 
 float NcReader3D::generateBathCoordinate(int i,int yOf){
