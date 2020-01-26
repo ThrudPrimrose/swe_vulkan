@@ -265,7 +265,7 @@ void NcReader3D::updateMaxHandB(){
   float minB;
   if(b_vec[0]<0){
     maxH = h_vec[0] +b_vec[0];
-    maxB = 1.f;
+    maxB = 0.f;
     minB = b_vec[0];
   }else{
     maxH = 0.f;
@@ -285,6 +285,9 @@ void NcReader3D::updateMaxHandB(){
   maxBforGreen = maxB;
   minBforP = minB;
   bathOffset = (maxCor * -minB) / maxB;
+  if(maxB<=0){
+      bathOffset = 2;
+  }
   bathOffset*=-1;
   //std::cout<<"Dynamic max height is: "<<maxHforWhite<<std::endl;
   //std::cout<<"Dynamic max bathymetry is: "<<maxBforGreen<<std::endl;
