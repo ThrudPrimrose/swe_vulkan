@@ -26,14 +26,14 @@ then
 	    make run
 	fi
 else
-	if [ $2 == twod ] 
+	if [ $1 == twod ] 
 	then
 	    echo "First->" $1
 	    echo "Second->" $2
 	    echo "only 2D run:"
 	    make twodrun
 	fi
-	if [ $2 == thrid ]
+	if [ $1 == thrid ]
 	then
 	    echo "First->" $1
 	    echo "Second->" $2
